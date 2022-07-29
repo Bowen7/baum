@@ -1,1 +1,4 @@
-export * from './lib/nd-tree';
+import { NdTree } from './nd-tree';
+
+export { NdTree };
+export default NdTree;
