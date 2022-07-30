@@ -1,5 +1,5 @@
-import { memo, useMemo } from "react";
-import { NdTreeContext } from "./context";
+import { memo, useMemo } from 'react';
+import { NdTreeContext } from './context';
 
 type NdTreeElementTypesProps = {
   node?: React.ElementType;
@@ -13,10 +13,10 @@ type NdTreeComponentsProps = {
 
 export type NdTreeProps = {
   data: any;
-  direction?: "vertical" | "horizontal";
+  direction?: 'vertical' | 'horizontal';
   childrenKey?: string;
-  virtualized?: boolean;
-  observeResize?: boolean;
+  // virtualized?: boolean;
+  // observeResize?: boolean;
   elementTypes?: NdTreeElementTypesProps;
   components?: NdTreeComponentsProps;
   onLayout?: () => void;
@@ -26,10 +26,10 @@ export type NdTreeProps = {
 export const NdTree = memo((props: NdTreeProps) => {
   const {
     data,
-    direction = "horizontal",
-    childrenKey = "children",
-    virtualized = false,
-    observeResize = false,
+    direction = 'horizontal',
+    childrenKey = 'children',
+    // virtualized = false,
+    // observeResize = false,
     elementTypes = {},
     components = {},
     onLayout,
@@ -37,8 +37,8 @@ export const NdTree = memo((props: NdTreeProps) => {
   } = props;
 
   const {
-    node: nodeElementType = "div",
-    container: containerElementType = "div",
+    node: nodeElementType = 'div',
+    container: containerElementType = 'div',
   } = elementTypes;
 
   const { node: NodeComponent, arrow: ArrowComponent } = components;
