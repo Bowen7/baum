@@ -1,5 +1,6 @@
 import { memo, useMemo } from 'react';
-import { NdTreeContext } from './context';
+import { NdTreeContext } from '../contexts';
+import { Container } from '../container';
 
 type NdTreeElementTypesProps = {
   node?: React.ElementType;
@@ -17,6 +18,7 @@ export type NdTreeProps = {
   childrenKey?: string;
   // virtualized?: boolean;
   // observeResize?: boolean;
+  nodeClassName?: string;
   elementTypes?: NdTreeElementTypesProps;
   components?: NdTreeComponentsProps;
   onLayout?: () => void;
@@ -28,6 +30,7 @@ export const NdTree = memo((props: NdTreeProps) => {
     data,
     direction = 'horizontal',
     childrenKey = 'children',
+    nodeClassName = '',
     // virtualized = false,
     // observeResize = false,
     elementTypes = {},
@@ -43,7 +46,14 @@ export const NdTree = memo((props: NdTreeProps) => {
 
   const { node: NodeComponent, arrow: ArrowComponent } = components;
 
-  const contextValue = useMemo(() => ({}), []);
+  const contextValue = useMemo(
+    () => ({ data, nodeClassName }),
+    [data, nodeClassName]
+  );
 
-  return <NdTreeContext.Provider value={contextValue}></NdTreeContext.Provider>;
+  return (
+    <NdTreeContext.Provider value={contextValue}>
+      <Container />
+    </NdTreeContext.Provider>
+  );
 });
