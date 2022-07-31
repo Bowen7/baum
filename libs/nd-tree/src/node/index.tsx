@@ -1,6 +1,8 @@
 import { useContext, useMemo, useState, useRef, useEffect } from 'react';
 import { NdTreeContext } from '../contexts';
 import { useLayouts } from '../utils';
+import { NdTreeBox } from '../arrow';
+import { SVGPortal } from '../svg-portal';
 type NodeProps = {
   index: number;
   x: number;
@@ -8,14 +10,14 @@ type NodeProps = {
   node: any;
   onNodeLayout: (index: number, layout: [number, number]) => void;
 };
-const MARGIN_HORIZONTAL = 20;
-const MARGIN_VERTICAL = 10;
+const MARGIN_HORIZONTAL = 80;
+const MARGIN_VERTICAL = 40;
 export const Node = (props: NodeProps) => {
   const { index, x, y, node, onNodeLayout } = props;
   const { name, children: nodeChildren = [] } = node;
 
   const nodeRef = useRef<HTMLDivElement>(null);
-  const { nodeClassName } = useContext(NdTreeContext);
+  const { nodeClassName, ArrowComponent } = useContext(NdTreeContext);
   const [layout, setLayout] = useState<[number, number]>([0, 0]);
   const [nodeLayout, setNodeLayout] = useState<[number, number]>([0, 0]);
   const [layouts, layoutsRef, setChildLayout] = useLayouts(nodeChildren.length);
@@ -61,6 +63,28 @@ export const Node = (props: NodeProps) => {
   }, [x, y, nodeLayout, layouts]);
 
   const nodeY = y + (layout[1] - nodeLayout[1]) / 2;
+
+  const arrowStartBox = useMemo<NdTreeBox>(
+    () => ({
+      x: x,
+      y: nodeY,
+      width: nodeLayout[0],
+      height: nodeLayout[1],
+    }),
+    [x, nodeY, nodeLayout]
+  );
+
+  const arrowEndBoxes = useMemo<NdTreeBox[]>(
+    () =>
+      childrenPositions.map((position, index) => ({
+        x: position[0],
+        y: position[1],
+        width: layouts[index][0],
+        height: layouts[index][1],
+      })),
+    [childrenPositions, layouts]
+  );
+
   return (
     <>
       <div
@@ -87,6 +111,11 @@ export const Node = (props: NodeProps) => {
           />
         );
       })}
+      <SVGPortal>
+        {arrowEndBoxes.map((arrowEndBox) => (
+          <ArrowComponent startBox={arrowStartBox} endBox={arrowEndBox} />
+        ))}
+      </SVGPortal>
     </>
   );
 };

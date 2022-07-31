@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
-import { NdTreeContext } from '../contexts';
+import { NdTreeContext, NdTreeContextValue } from '../contexts';
 import { Container } from '../container';
+import { Arrow, ArrowProps } from '../arrow';
 
 type NdTreeElementTypesProps = {
   node?: React.ElementType;
@@ -9,7 +10,7 @@ type NdTreeElementTypesProps = {
 
 type NdTreeComponentsProps = {
   node?: React.ComponentType;
-  arrow?: React.ComponentType;
+  arrow?: React.ComponentType<ArrowProps>;
 };
 
 export type NdTreeProps = {
@@ -44,11 +45,11 @@ export const NdTree = memo((props: NdTreeProps) => {
     container: containerElementType = 'div',
   } = elementTypes;
 
-  const { node: NodeComponent, arrow: ArrowComponent } = components;
+  const { node: NodeComponent, arrow: ArrowComponent = Arrow } = components;
 
-  const contextValue = useMemo(
-    () => ({ data, nodeClassName }),
-    [data, nodeClassName]
+  const contextValue = useMemo<NdTreeContextValue>(
+    () => ({ data, ArrowComponent, nodeClassName }),
+    [data, ArrowComponent, nodeClassName]
   );
 
   return (

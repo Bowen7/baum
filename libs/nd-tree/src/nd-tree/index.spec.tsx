@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 
-import { NdTree } from './nd-tree';
+import { NdTree } from '.';
 
 // describe('NdTree', () => {
 //   it('should render successfully', () => {

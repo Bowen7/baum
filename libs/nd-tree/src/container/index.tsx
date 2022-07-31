@@ -6,13 +6,13 @@ export const Container = () => {
   const { data } = useContext(NdTreeContext);
 
   const [laidout, setLaidout] = useState(false);
-  const [layout, setLayout] = useState<[number, number]>([100, 100]);
+  const [layout, setLayout] = useState<[number, number]>([0, 0]);
   const [svgNode, setSVGNode] = useState<SVGSVGElement | null>(null);
   const layoutRef = useRef<[number, number]>([0, 0]);
 
   const handleNodeLayout = (layout: [number, number]) => {
     layoutRef.current = layout;
-    setLaidout(false);
+    setLaidout(true);
   };
 
   useEffect(() => {
@@ -26,6 +26,9 @@ export const Container = () => {
       style={{
         position: 'relative',
         display: 'inline-block',
+        width: layout[0] + 'px',
+        height: layout[1] + 'px',
+        overflow: 'hidden',
       }}
     >
       <svg
@@ -43,8 +46,7 @@ export const Container = () => {
       <SVGContainerContext.Provider value={svgNode}>
         <div
           style={{
-            width: layout[0] + 'px',
-            height: layout[1] + 'px',
+            whiteSpace: 'nowrap',
           }}
         >
           {svgNode && (
