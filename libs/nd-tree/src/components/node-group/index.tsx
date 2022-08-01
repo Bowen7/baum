@@ -1,33 +1,32 @@
 import { useContext, useMemo, useState, useRef, useEffect } from 'react';
-import { NdTreeContext } from '../contexts';
-import { useLayouts } from '../utils';
+import { NdTreeContext } from '../../contexts';
+import { useLayouts } from '../../utils';
 import { NdTreeBox } from '../arrow';
 import { SVGPortal } from '../svg-portal';
-type NodeProps = {
+import { Node } from '../node';
+type NodeGroupProps = {
   index: number;
   x: number;
   y: number;
   node: any;
   arrowStartBox?: NdTreeBox;
-  onNodeLayout: (index: number, layout: [number, number]) => void;
+  onNodeGroupLayout: (index: number, layout: [number, number]) => void;
 };
 const MARGIN_HORIZONTAL = 80;
 const MARGIN_VERTICAL = 40;
-export const Node = (props: NodeProps) => {
-  const { index, x, y, node, arrowStartBox, onNodeLayout } = props;
-  const { name, children: nodeChildren = [] } = node;
+export const NodeGroup = (props: NodeGroupProps) => {
+  const { index, x, y, node, arrowStartBox, onNodeGroupLayout } = props;
+  const { children: nodeChildren = [] } = node;
 
-  const nodeRef = useRef<HTMLDivElement>(null);
-  const { nodeClassName, ArrowComponent } = useContext(NdTreeContext);
+  const { nodeClassName, ArrowComponent, ContentComponent } =
+    useContext(NdTreeContext);
   const [layout, setLayout] = useState<[number, number]>([0, 0]);
+  const nodeLayoutRef = useRef<[number, number]>([0, 0]);
   const [nodeLayout, setNodeLayout] = useState<[number, number]>([0, 0]);
   const [layouts, layoutsRef, setChildLayout] = useLayouts(nodeChildren.length);
 
   useEffect(() => {
-    if (!nodeRef.current) {
-      return;
-    }
-    const { width, height } = nodeRef.current.getBoundingClientRect();
+    const [nodeWidth, nodeHeight] = nodeLayoutRef.current;
     let [childrenWidth, childrenHeight] = layoutsRef.current
       .slice(0, nodeChildren.length)
       .reduce(
@@ -42,12 +41,12 @@ export const Node = (props: NodeProps) => {
     }
 
     const layout: [number, number] = [
-      width + childrenWidth,
-      Math.max(height, childrenHeight),
+      nodeWidth + childrenWidth,
+      Math.max(nodeHeight, childrenHeight),
     ];
 
-    onNodeLayout(index, layout);
-    setNodeLayout([width, height]);
+    onNodeGroupLayout(index, layout);
+    setNodeLayout(nodeLayoutRef.current);
     setLayout(layout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
@@ -75,30 +74,30 @@ export const Node = (props: NodeProps) => {
     [x, nodeY, nodeLayout]
   );
 
+  const handleNodeLayout = (layout: [number, number]) => {
+    nodeLayoutRef.current = layout;
+  };
+
   return (
     <>
-      <div
-        ref={nodeRef}
+      <Node
         className={nodeClassName}
-        style={{
-          transform: `translate(${x}px, ${nodeY}px)`,
-          position: 'absolute',
-          top: 0,
-          left: 0,
-        }}
-      >
-        {name}
-      </div>
+        x={x}
+        y={nodeY}
+        node={node}
+        ContentComponent={ContentComponent}
+        onNodeLayout={handleNodeLayout}
+      />
       {nodeChildren.map((child: any, index: number) => {
         const [childX = -9999, childY = -9999] = childrenPositions[index] || [];
         return (
-          <Node
+          <NodeGroup
             index={index}
             x={childX}
             y={childY}
             node={child}
             arrowStartBox={arrowEndBox}
-            onNodeLayout={setChildLayout}
+            onNodeGroupLayout={setChildLayout}
           />
         );
       })}

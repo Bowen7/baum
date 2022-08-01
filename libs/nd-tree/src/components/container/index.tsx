@@ -1,25 +1,25 @@
 import { useContext, useRef, useState, useEffect } from 'react';
-import { Node } from '../node';
-import { NdTreeContext, SVGContainerContext } from '../contexts';
+import { NodeGroup } from '../node-group';
+import { NdTreeContext, SVGContainerContext } from '../../contexts';
 
 export const Container = () => {
   const { data } = useContext(NdTreeContext);
 
-  const [laidout, setLaidout] = useState(false);
+  const [layoutCount, setLayoutCount] = useState(0);
   const [layout, setLayout] = useState<[number, number]>([0, 0]);
   const [svgNode, setSVGNode] = useState<SVGSVGElement | null>(null);
   const layoutRef = useRef<[number, number]>([0, 0]);
 
   const handleNodeLayout = (layout: [number, number]) => {
     layoutRef.current = layout;
-    setLaidout(true);
+    setLayoutCount((count) => count + 1);
   };
 
   useEffect(() => {
-    if (laidout) {
+    if (layoutCount > 0) {
       setLayout(layoutRef.current);
     }
-  }, [laidout]);
+  }, [layoutCount]);
 
   return (
     <div
@@ -55,12 +55,12 @@ export const Container = () => {
           }}
         >
           {svgNode && (
-            <Node
+            <NodeGroup
               index={0}
               x={0}
               y={0}
               node={data}
-              onNodeLayout={(_, layout) => handleNodeLayout(layout)}
+              onNodeGroupLayout={(_, layout) => handleNodeLayout(layout)}
             />
           )}
         </div>

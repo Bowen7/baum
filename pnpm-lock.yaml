@@ -32,6 +32,7 @@ specifiers:
   perfect-arrows: ^0.3.7
   prettier: ^2.6.2
   react: 18.2.0
+  react-cool-dimensions: ^2.0.7
   react-dom: 18.2.0
   react-test-renderer: 18.2.0
   react-use: ^17.4.0
@@ -45,6 +46,7 @@ dependencies:
   core-js: 3.24.0
   perfect-arrows: 0.3.7
   react: 18.2.0
+  react-cool-dimensions: 2.0.7_react@18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-use: 17.4.0_biqbaboplfbrettd7655fr4n2y
   regenerator-runtime: 0.13.7
@@ -8519,6 +8521,14 @@ packages:
       schema-utils: 3.1.1
       webpack: 5.74.0
     dev: true
+
+  /react-cool-dimensions/2.0.7_react@18.2.0:
+    resolution: {integrity: sha512-z1VwkAAJ5d8QybDRuYIXTE41RxGr5GYsv1bQhbOBE8cMfoZQZpcF0odL64vdgrQVzat2jayedj1GoYi80FWcbA==}
+    peerDependencies:
+      react: '>= 16.8.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /react-dom/18.2.0_react@18.2.0:
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}

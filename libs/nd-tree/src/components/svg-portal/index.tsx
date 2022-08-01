@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { createPortal } from 'react-dom';
-import { SVGContainerContext } from '../contexts';
+import { SVGContainerContext } from '../../contexts';
 
 type Props = {
   children: React.ReactNode;

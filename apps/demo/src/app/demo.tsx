@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NdTree } from 'nd-tree';
 import { NdTreePerfectArrows } from 'nd-tree-perfect-arrows';
 import './demo.css';
@@ -16,12 +17,27 @@ const data = {
   ],
 };
 
+type ContentProps = { node: any };
+const Content = (props: ContentProps) => {
+  const { name } = props.node;
+  const [collapsed, setCollapsed] = useState(true);
+  return (
+    <>
+      <div>{name}</div>
+      <button onClick={() => setCollapsed((c) => !c)}>
+        {collapsed ? 'expand' : 'collapse'}
+      </button>
+      {!collapsed && <div>extra content</div>}
+    </>
+  );
+};
+
 export const Demo = () => {
   return (
     <NdTree
       data={data}
       nodeClassName="node"
-      components={{ arrow: NdTreePerfectArrows }}
+      components={{ arrow: NdTreePerfectArrows, content: Content }}
     />
   );
 };

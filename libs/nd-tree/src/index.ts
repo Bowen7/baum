@@ -1,4 +1,4 @@
-import { NdTree } from './nd-tree';
+import { NdTree } from './components/nd-tree';
 
 export { NdTree };
 export default NdTree;
