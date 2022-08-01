@@ -1,0 +1,43 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/nd-tree-perfect-arrows/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nrwl/web:rollup",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/nd-tree-perfect-arrows",
+        "tsConfig": "libs/nd-tree-perfect-arrows/tsconfig.lib.json",
+        "project": "libs/nd-tree-perfect-arrows/package.json",
+        "entryFile": "libs/nd-tree-perfect-arrows/src/index.ts",
+        "external": ["react/jsx-runtime"],
+        "rollupConfig": "@nrwl/react/plugins/bundle-rollup",
+        "compiler": "babel",
+        "assets": [
+          {
+            "glob": "libs/nd-tree-perfect-arrows/README.md",
+            "input": ".",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/nd-tree-perfect-arrows/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/nd-tree-perfect-arrows"],
+      "options": {
+        "jestConfig": "libs/nd-tree-perfect-arrows/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

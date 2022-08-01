@@ -37,6 +37,9 @@ export const Container = () => {
         xmlns="http://www.w3.org/2000/svg"
         width={layout[0]}
         height={layout[1]}
+        stroke="#666"
+        fill="#666"
+        strokeWidth={2}
         style={{
           position: 'absolute',
           left: 0,
@@ -46,7 +49,9 @@ export const Container = () => {
       <SVGContainerContext.Provider value={svgNode}>
         <div
           style={{
-            whiteSpace: 'nowrap',
+            position: 'absolute',
+            width: '9999px',
+            height: '9999px',
           }}
         >
           {svgNode && (

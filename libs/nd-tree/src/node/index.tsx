@@ -8,12 +8,13 @@ type NodeProps = {
   x: number;
   y: number;
   node: any;
+  arrowStartBox?: NdTreeBox;
   onNodeLayout: (index: number, layout: [number, number]) => void;
 };
 const MARGIN_HORIZONTAL = 80;
 const MARGIN_VERTICAL = 40;
 export const Node = (props: NodeProps) => {
-  const { index, x, y, node, onNodeLayout } = props;
+  const { index, x, y, node, arrowStartBox, onNodeLayout } = props;
   const { name, children: nodeChildren = [] } = node;
 
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -64,7 +65,7 @@ export const Node = (props: NodeProps) => {
 
   const nodeY = y + (layout[1] - nodeLayout[1]) / 2;
 
-  const arrowStartBox = useMemo<NdTreeBox>(
+  const arrowEndBox = useMemo<NdTreeBox>(
     () => ({
       x: x,
       y: nodeY,
@@ -72,17 +73,6 @@ export const Node = (props: NodeProps) => {
       height: nodeLayout[1],
     }),
     [x, nodeY, nodeLayout]
-  );
-
-  const arrowEndBoxes = useMemo<NdTreeBox[]>(
-    () =>
-      childrenPositions.map((position, index) => ({
-        x: position[0],
-        y: position[1],
-        width: layouts[index][0],
-        height: layouts[index][1],
-      })),
-    [childrenPositions, layouts]
   );
 
   return (
@@ -107,15 +97,16 @@ export const Node = (props: NodeProps) => {
             x={childX}
             y={childY}
             node={child}
+            arrowStartBox={arrowEndBox}
             onNodeLayout={setChildLayout}
           />
         );
       })}
-      <SVGPortal>
-        {arrowEndBoxes.map((arrowEndBox) => (
+      {arrowStartBox && (
+        <SVGPortal>
           <ArrowComponent startBox={arrowStartBox} endBox={arrowEndBox} />
-        ))}
-      </SVGPortal>
+        </SVGPortal>
+      )}
     </>
   );
 };

@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "nd-tree": ["libs/nd-tree/src/index.ts"]
+      "nd-tree": ["libs/nd-tree/src/index.ts"],
+      "nd-tree-perfect-arrows": ["libs/nd-tree-perfect-arrows/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
