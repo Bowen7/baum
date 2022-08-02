@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { NdTreeContext, NdTreeContextValue } from '../../contexts';
 import { Container } from '../container';
 import { Arrow, ArrowProps } from '../arrow';
@@ -53,9 +53,17 @@ export const NdTree = memo((props: NdTreeProps) => {
     content: ContentComponent = NodeContent,
   } = components;
 
+  const [layoutMap] = useState(() => new Map());
+
   const contextValue = useMemo<NdTreeContextValue>(
-    () => ({ data, ArrowComponent, nodeClassName, ContentComponent }),
-    [data, ArrowComponent, nodeClassName, ContentComponent]
+    () => ({
+      data,
+      ArrowComponent,
+      nodeClassName,
+      ContentComponent,
+      layoutMap,
+    }),
+    [data, ArrowComponent, nodeClassName, ContentComponent, layoutMap]
   );
 
   return (

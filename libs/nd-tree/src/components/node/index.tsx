@@ -9,7 +9,6 @@ type NodeProps = {
 };
 export const Node = (props: NodeProps) => {
   const { className = '', x, y, node, ContentComponent, onNodeLayout } = props;
-  const { name = '' } = node;
 
   const nodeRef = useRef<HTMLDivElement>(null);
 

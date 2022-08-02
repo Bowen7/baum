@@ -7,6 +7,7 @@ export type NdTreeContextValue = {
   ArrowComponent: React.ComponentType<ArrowProps>;
   ContentComponent: React.ComponentType<NodeContentProps>;
   nodeClassName: string;
+  layoutMap: Map<string, [number, number]>;
 };
 
 export const NdTreeContext = createContext<NdTreeContextValue>({
@@ -14,4 +15,5 @@ export const NdTreeContext = createContext<NdTreeContextValue>({
   nodeClassName: '',
   ArrowComponent: Arrow,
   ContentComponent: NodeContent,
+  layoutMap: new Map(),
 });
