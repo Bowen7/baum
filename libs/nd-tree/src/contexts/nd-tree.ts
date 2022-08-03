@@ -7,7 +7,7 @@ export type NdTreeContextValue = {
   ArrowComponent: React.ComponentType<ArrowProps>;
   ContentComponent: React.ComponentType<NodeContentProps>;
   nodeClassName: string;
-  layoutMap: Map<string, [number, number]>;
+  onNodeLayout: (path: string, layout: [number, number]) => void;
 };
 
 export const NdTreeContext = createContext<NdTreeContextValue>({
@@ -15,5 +15,6 @@ export const NdTreeContext = createContext<NdTreeContextValue>({
   nodeClassName: '',
   ArrowComponent: Arrow,
   ContentComponent: NodeContent,
-  layoutMap: new Map(),
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onNodeLayout: () => {},
 });

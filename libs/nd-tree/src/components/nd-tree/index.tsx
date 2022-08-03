@@ -3,6 +3,7 @@ import { NdTreeContext, NdTreeContextValue } from '../../contexts';
 import { Container } from '../container';
 import { Arrow, ArrowProps } from '../arrow';
 import { NodeContent, NodeContentProps } from '../node';
+import { useCallback } from 'react';
 
 type NdTreeElementTypesProps = {
   node?: React.ElementType;
@@ -25,7 +26,6 @@ export type NdTreeProps = {
   elementTypes?: NdTreeElementTypesProps;
   components?: NdTreeComponentsProps;
   onLayout?: () => void;
-  onNodeLayout?: () => void;
 };
 
 export const NdTree = memo((props: NdTreeProps) => {
@@ -39,7 +39,6 @@ export const NdTree = memo((props: NdTreeProps) => {
     elementTypes = {},
     components = {},
     onLayout,
-    onNodeLayout,
   } = props;
 
   const {
@@ -53,7 +52,14 @@ export const NdTree = memo((props: NdTreeProps) => {
     content: ContentComponent = NodeContent,
   } = components;
 
-  const [layoutMap] = useState(() => new Map());
+  const [layoutMap] = useState<Map<string, [number, number]>>(() => new Map());
+
+  const onNodeLayout = useCallback(
+    (path: string, layout: [number, number]) => {
+      layoutMap.set(path, layout);
+    },
+    [layoutMap]
+  );
 
   const contextValue = useMemo<NdTreeContextValue>(
     () => ({
@@ -61,9 +67,9 @@ export const NdTree = memo((props: NdTreeProps) => {
       ArrowComponent,
       nodeClassName,
       ContentComponent,
-      layoutMap,
+      onNodeLayout,
     }),
-    [data, ArrowComponent, nodeClassName, ContentComponent, layoutMap]
+    [data, ArrowComponent, nodeClassName, ContentComponent, onNodeLayout]
   );
 
   return (
