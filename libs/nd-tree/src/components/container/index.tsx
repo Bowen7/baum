@@ -1,9 +1,9 @@
 import { useContext, useRef, useState, useEffect } from 'react';
 import { NodeGroup } from '../node-group';
-import { NdTreeContext, SVGContainerContext } from '../../contexts';
+import { OptionsContext, SVGContainerContext } from '../../contexts';
 
 export const Container = () => {
-  const { data } = useContext(NdTreeContext);
+  const { data } = useContext(OptionsContext);
 
   const [layoutCount, setLayoutCount] = useState(0);
   const [layout, setLayout] = useState<[number, number]>([0, 0]);

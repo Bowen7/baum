@@ -1,5 +1,5 @@
 import { useContext, useMemo, useState, useRef, useEffect } from 'react';
-import { NdTreeContext } from '../../contexts';
+import { OptionsContext } from '../../contexts';
 import { useLayouts } from '../../utils';
 import { NdTreeBox } from '../arrow';
 import { SVGPortal } from '../svg-portal';
@@ -19,7 +19,7 @@ export const NodeGroup = (props: NodeGroupProps) => {
   const { children: nodeChildren = [] } = node;
 
   const { nodeClassName, ArrowComponent, ContentComponent } =
-    useContext(NdTreeContext);
+    useContext(OptionsContext);
   const [layout, setLayout] = useState<[number, number]>([0, 0]);
   const nodeLayoutRef = useRef<[number, number]>([0, 0]);
   const [nodeLayout, setNodeLayout] = useState<[number, number]>([0, 0]);

@@ -2,7 +2,7 @@ import React, { createContext } from 'react';
 import { Arrow, ArrowProps } from '../components/arrow';
 import { NodeContent, NodeContentProps } from '../components/node';
 
-export type NdTreeContextValue = {
+export type OptionsContextValue = {
   data: any;
   ArrowComponent: React.ComponentType<ArrowProps>;
   ContentComponent: React.ComponentType<NodeContentProps>;
@@ -10,7 +10,7 @@ export type NdTreeContextValue = {
   onNodeLayout: (path: string, layout: [number, number]) => void;
 };
 
-export const NdTreeContext = createContext<NdTreeContextValue>({
+export const OptionsContext = createContext<OptionsContextValue>({
   data: {},
   nodeClassName: '',
   ArrowComponent: Arrow,

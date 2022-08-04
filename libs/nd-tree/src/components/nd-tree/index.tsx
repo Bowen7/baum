@@ -1,5 +1,5 @@
 import { memo, useMemo, useState } from 'react';
-import { NdTreeContext, NdTreeContextValue } from '../../contexts';
+import { OptionsContext, OptionsContextValue } from '../../contexts';
 import { Container } from '../container';
 import { Arrow, ArrowProps } from '../arrow';
 import { NodeContent, NodeContentProps } from '../node';
@@ -61,7 +61,7 @@ export const NdTree = memo((props: NdTreeProps) => {
     [layoutMap]
   );
 
-  const contextValue = useMemo<NdTreeContextValue>(
+  const contextValue = useMemo<OptionsContextValue>(
     () => ({
       data,
       ArrowComponent,
@@ -73,8 +73,8 @@ export const NdTree = memo((props: NdTreeProps) => {
   );
 
   return (
-    <NdTreeContext.Provider value={contextValue}>
+    <OptionsContext.Provider value={contextValue}>
       <Container />
-    </NdTreeContext.Provider>
+    </OptionsContext.Provider>
   );
 });
