@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState, useCallback } from 'react';
 import {
   OptionsContext,
   OptionsContextValue,
@@ -8,7 +8,7 @@ import {
 import { Container } from '../container';
 import { Arrow, ArrowProps } from '../arrow';
 import { NodeContent, NodeContentProps } from '../node';
-import { useCallback } from 'react';
+import { useCurrentState } from '../../utils';
 
 type NdTreeElementTypesProps = {
   node?: React.ElementType;
@@ -62,12 +62,9 @@ export const NdTree = memo((props: NdTreeProps) => {
     () => new Map()
   );
 
-  const onNodeResize = useCallback(
-    (path: string, size: [number, number]) => {
-      sizeMap.current.set(path, size);
-    },
-    []
-  );
+  const onNodeResize = useCallback((path: string, size: [number, number]) => {
+    sizeMap.current.set(path, size);
+  }, []);
 
   const optionsContextValue = useMemo<OptionsContextValue>(
     () => ({
@@ -85,7 +82,7 @@ export const NdTree = memo((props: NdTreeProps) => {
       positionMap,
       onNodeResize,
     }),
-    []
+    [onNodeResize, positionMap]
   );
 
   return (
