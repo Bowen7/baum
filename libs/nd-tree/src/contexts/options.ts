@@ -7,7 +7,6 @@ export type OptionsContextValue = {
   ArrowComponent: React.ComponentType<ArrowProps>;
   ContentComponent: React.ComponentType<NodeContentProps>;
   nodeClassName: string;
-  onNodeLayout: (path: string, layout: [number, number]) => void;
 };
 
 export const OptionsContext = createContext<OptionsContextValue>({
@@ -15,6 +14,4 @@ export const OptionsContext = createContext<OptionsContextValue>({
   nodeClassName: '',
   ArrowComponent: Arrow,
   ContentComponent: NodeContent,
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onNodeLayout: () => {},
 });
