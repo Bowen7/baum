@@ -13,6 +13,7 @@ import {
   LayoutContext,
   LayoutContextValue,
 } from '../../contexts';
+import { Position, Size } from '../../types';
 
 export const Container = () => {
   const { data } = useContext(OptionsContext);

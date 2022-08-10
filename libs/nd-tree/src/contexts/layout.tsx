@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import { Position, Size } from '../types';
 
 export type LayoutContextValue = {
   sizeMap: Map<string, Size>;

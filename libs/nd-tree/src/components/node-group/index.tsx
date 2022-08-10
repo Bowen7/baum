@@ -1,6 +1,7 @@
 import { useContext, useMemo, useState, useRef, useEffect } from 'react';
 import { OptionsContext, LayoutContext } from '../../contexts';
 import { Node } from '../node';
+import { Position } from '../../types';
 type NodeGroupProps = {
   path: string;
   node: any;
