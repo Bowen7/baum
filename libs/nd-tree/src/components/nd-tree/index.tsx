@@ -1,14 +1,8 @@
 import { memo, useMemo, useRef, useState, useCallback } from 'react';
-import {
-  OptionsContext,
-  OptionsContextValue,
-  LayoutContext,
-  LayoutContextValue,
-} from '../../contexts';
+import { OptionsContext, OptionsContextValue } from '../../contexts';
 import { Container } from '../container';
 import { Arrow, ArrowProps } from '../arrow';
 import { NodeContent, NodeContentProps } from '../node';
-import { useCurrentState } from '../../utils';
 
 type NdTreeElementTypesProps = {
   node?: React.ElementType;
@@ -57,15 +51,6 @@ export const NdTree = memo((props: NdTreeProps) => {
     content: ContentComponent = NodeContent,
   } = components;
 
-  const sizeMap = useRef<Map<string, Size>>(new Map());
-  const [positionMap, setPositionMap] = useState<Map<string, Position>>(
-    () => new Map()
-  );
-
-  const onNodeResize = useCallback((path: string, size: [number, number]) => {
-    sizeMap.current.set(path, size);
-  }, []);
-
   const optionsContextValue = useMemo<OptionsContextValue>(
     () => ({
       data,
@@ -76,20 +61,9 @@ export const NdTree = memo((props: NdTreeProps) => {
     [data, ArrowComponent, nodeClassName, ContentComponent]
   );
 
-  const layoutContextValue = useMemo<LayoutContextValue>(
-    () => ({
-      sizeMap: sizeMap.current,
-      positionMap,
-      onNodeResize,
-    }),
-    [onNodeResize, positionMap]
-  );
-
   return (
     <OptionsContext.Provider value={optionsContextValue}>
-      <LayoutContext.Provider value={layoutContextValue}>
-        <Container />
-      </LayoutContext.Provider>
+      <Container />
     </OptionsContext.Provider>
   );
 });
