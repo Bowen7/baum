@@ -24,7 +24,22 @@ export type NdTreeProps = {
   nodeClassName?: string;
   elementTypes?: NdTreeElementTypesProps;
   components?: NdTreeComponentsProps;
+  dataTransform?: () => any;
   onLayout?: () => void;
+};
+
+const defaultDataTransform = <T extends { children: T[] }>(data: T): T[] => {
+  const stack: T[] = [data];
+  const nodes: T[] = [];
+  while (stack.length > 0) {
+    const node = stack.pop()!;
+    nodes.push(node);
+    const { children = [] } = node;
+    for (let i = children.length - 1; i >= 0; i--) {
+      stack.push(children[i]);
+    }
+  }
+  return nodes;
 };
 
 export const NdTree = memo((props: NdTreeProps) => {
@@ -37,6 +52,7 @@ export const NdTree = memo((props: NdTreeProps) => {
     // observeResize = false,
     elementTypes = {},
     components = {},
+    dataTransform = defaultDataTransform,
     onLayout,
   } = props;
 
@@ -60,6 +76,8 @@ export const NdTree = memo((props: NdTreeProps) => {
     }),
     [data, ArrowComponent, nodeClassName, ContentComponent]
   );
+
+  const nodes = useMemo(() => dataTransform(data), [data, dataTransform]);
 
   return (
     <OptionsContext.Provider value={optionsContextValue}>
