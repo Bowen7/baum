@@ -28,18 +28,21 @@ export type NdTreeProps = {
   onLayout?: () => void;
 };
 
-const defaultDataTransform = <T extends { children: T[] }>(data: T): T[] => {
-  const stack: T[] = [data];
-  const nodes: T[] = [];
+export const defaultDataTransform = <T extends { children: T[] }>(
+  data: T
+): { node: T; path: string }[] => {
+  const stack: { node: T; path: string }[] = [{ path: '', node: data }];
+  const result: { node: T; path: string }[] = [];
   while (stack.length > 0) {
-    const node = stack.pop()!;
-    nodes.push(node);
+    const item = stack.pop()!;
+    result.push(item);
+    const { path, node } = item;
     const { children = [] } = node;
     for (let i = children.length - 1; i >= 0; i--) {
-      stack.push(children[i]);
+      stack.push({ path: path + '-' + i, node: children[i] });
     }
   }
-  return nodes;
+  return result.reverse();
 };
 
 export const NdTree = memo((props: NdTreeProps) => {
@@ -77,11 +80,14 @@ export const NdTree = memo((props: NdTreeProps) => {
     [data, ArrowComponent, nodeClassName, ContentComponent]
   );
 
-  const nodes = useMemo(() => dataTransform(data), [data, dataTransform]);
+  const transformedData = useMemo(
+    () => dataTransform(data),
+    [data, dataTransform]
+  );
 
   return (
     <OptionsContext.Provider value={optionsContextValue}>
-      <Container />
+      <Container transformedData={transformedData} />
     </OptionsContext.Provider>
   );
 });

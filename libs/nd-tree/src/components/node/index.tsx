@@ -1,24 +1,25 @@
 import { useEffect, useRef } from 'react';
+import { Position } from '../../types';
 type NodeProps = {
   className: string;
-  x: number;
-  y: number;
   node: any;
-  ContentComponent: React.ComponentType<NodeContentProps>;
-  onNodeLayout: (layout: [number, number]) => void;
+  path: string;
+  positionMap: Map<string, Position>;
+  onResize: (path: string, node: any, layout: [number, number]) => void;
 };
 export const Node = (props: NodeProps) => {
-  const { className = '', x, y, node, ContentComponent, onNodeLayout } = props;
-
+  const { path, className = '', node, positionMap, onResize } = props;
   const nodeRef = useRef<HTMLDivElement>(null);
+  const [x = -9999, y = -9999] = positionMap.get(path) || [];
 
   useEffect(() => {
     if (!nodeRef.current) {
       return;
     }
     const { width, height } = nodeRef.current.getBoundingClientRect();
-    onNodeLayout([width, height]);
-  });
+    onResize(path, node, [width, height]);
+  }, [path]);
+
   return (
     <div
       ref={nodeRef}
@@ -30,7 +31,7 @@ export const Node = (props: NodeProps) => {
         left: 0,
       }}
     >
-      <ContentComponent node={node} />
+      <NodeContent node={node} />
     </div>
   );
 };
