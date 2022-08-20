@@ -24,7 +24,18 @@
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nrwl/nx/typescript"],
-      "rules": { "@typescript-eslint/no-non-null-assertion": "off" }
+      "rules": {
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/ban-types": [
+          "error",
+          {
+            "types": {
+              "{}": false
+            },
+            "extendDefaults": true
+          }
+        ]
+      }
     },
     {
       "files": ["*.js", "*.jsx"],
