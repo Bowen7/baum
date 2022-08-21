@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { NodeContainer } from '../node';
 
 type Node<T = {}> = T & {
   id: string;
@@ -17,5 +18,12 @@ export type NdTreeProps<T> = {
 };
 
 export const NdTree = memo(<T,>(props: NdTreeProps<T>) => {
-  return <></>;
+  const { nodes, edges } = props;
+  return (
+    <>
+      {nodes.map(({ id, ...rest }) => (
+        <NodeContainer key={id} id={id} {...rest} />
+      ))}
+    </>
+  );
 });
