@@ -1,23 +1,15 @@
 import { memo } from 'react';
+import { Change, Size, Node, Edge } from '../../types';
 import { NodeContainer } from '../node';
 
-type Node<T = {}> = T & {
-  id: string;
-  label?: string;
-};
-
-type Edge = {
-  source: string;
-  target: string;
-  type: string;
-};
-
-export type NdTreeProps<T> = {
-  nodes: Node<T>[];
+export type NdTreeProps = {
+  nodes: Node[];
   edges: Edge[];
+  onNodesResize: (changes: Change[]) => void;
+  onResize: (size: Size) => void;
 };
 
-export const NdTree = memo(<T,>(props: NdTreeProps<T>) => {
+export const NdTree = memo((props: NdTreeProps) => {
   const { nodes, edges } = props;
   return (
     <>
