@@ -9,16 +9,25 @@ export type Box = {
   height: number;
 };
 
-export type Node = {
+export type Node<T> = T & {
   id: string;
   label?: string;
-  [key: string]: unknown;
 };
 
 export type Edge = {
   source: string;
   target: string;
   type: string;
+};
+
+export type LaidoutNode<T> = Node<T> & {
+  x: number;
+  y: number;
+};
+
+export type LaidoutEdge = Edge & {
+  sourceBox: Box;
+  targetBox: Box;
 };
 
 export type Change = {

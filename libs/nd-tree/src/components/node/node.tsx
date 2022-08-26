@@ -1,8 +1,6 @@
 import { useEffect, useRef, memo } from 'react';
 import { Size } from '../../types';
 type NodeComponentProps<T = {}> = T & {
-  x: number;
-  y: number;
   label?: string;
   onResize?: (size: Size) => void;
 };
