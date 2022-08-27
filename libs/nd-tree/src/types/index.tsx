@@ -17,7 +17,7 @@ export type Node<T> = T & {
 export type Edge = {
   source: string;
   target: string;
-  type: string;
+  type?: string;
 };
 
 export type LaidoutNode<T> = Node<T> & {

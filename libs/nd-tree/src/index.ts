@@ -1,4 +1,4 @@
 import { NdTree } from './components/tree';
-
-export { NdTree };
-export default NdTree;
+import { useLayout } from './hooks';
+export * from './types';
+export { NdTree, useLayout };

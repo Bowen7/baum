@@ -1,27 +1,21 @@
 import { useState } from 'react';
-import { NdTree } from 'nd-tree';
-import { NdTreePerfectArrows } from 'nd-tree-perfect-arrows';
+import { NdTree, useLayout, Node, Edge } from 'nd-tree';
 import './demo.css';
-type Node = {
-  name: string;
-  children: Node[];
-};
-const data: Node = {
-  name: '11',
-  children: [
-    {
-      name: '1-1 zzz',
-      children: [{ name: '1-1-1\n111111\n22222', children: [] }],
-    },
-    {
-      name: '1-2',
-      children: [
-        { name: '1-2-1\n33333333\n4\n5\n6', children: [] },
-        { name: '1-2-2', children: [{ name: '1-2-2-1', children: [] }] },
-      ],
-    },
-  ],
-};
+const nodes: Node<{}>[] = [
+  { id: '1', label: '1111111' },
+  { id: '2', label: '222' },
+  { id: '3', label: '3333' },
+  { id: '4', label: '44' },
+  { id: '5', label: '5555' },
+  { id: '6', label: '666666' },
+];
+const edges: Edge[] = [
+  { source: '1', target: '2' },
+  { source: '1', target: '3' },
+  { source: '3', target: '4' },
+  { source: '3', target: '5' },
+  { source: '3', target: '6' },
+];
 
 type ContentProps = { node: any };
 const Content = (props: ContentProps) => {
@@ -39,11 +33,6 @@ const Content = (props: ContentProps) => {
 };
 
 export const Demo = () => {
-  return (
-    <NdTree
-      data={data}
-      nodeClassName="node"
-      components={{ arrow: NdTreePerfectArrows, content: Content }}
-    />
-  );
+  const bindings = useLayout(nodes, edges);
+  return <NdTree {...bindings} />;
 };

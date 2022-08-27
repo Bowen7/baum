@@ -96,5 +96,5 @@ export const useLayout = <T>(nodes: Node<T>[], edges: Edge[]) => {
     [edges, positionMap]
   );
 
-  return { onNodesResize };
+  return { nodes: laidoutNodes, edges: laidoutEdges, onNodesResize };
 };
