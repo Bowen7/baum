@@ -9,6 +9,12 @@ export type NodeContainerProps<T = {}> = T & {
 };
 
 export const NodeContainer = (props: NodeContainerProps) => {
-  const { id, label, ...restProps } = props;
-  return <DefaultNodeComponent id={id} label={label} {...restProps} />;
+  const { id, label, x, y, ...restProps } = props;
+  return (
+    <div
+      style={{ position: 'absolute', transform: `translate(${x}px, ${y}px)` }}
+    >
+      <DefaultNodeComponent id={id} label={label} {...restProps} />
+    </div>
+  );
 };

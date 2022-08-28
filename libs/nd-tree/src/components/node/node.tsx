@@ -1,5 +1,5 @@
 import { useEffect, useRef, memo } from 'react';
-import { Size, Change } from '../../types';
+import { Change } from '../../types';
 type NodeComponentProps<T = {}> = T & {
   id: string;
   label?: string;
@@ -15,5 +15,17 @@ export const DefaultNodeComponent = memo((props: NodeComponentProps) => {
       onResize({ id, action: 'mount', size: [width, height] });
     }
   }, []);
-  return <div ref={ref}>{label}</div>;
+  return (
+    <div
+      ref={ref}
+      style={{
+        border: '1px solid #1a192b',
+        borderRadius: '3px',
+        color: '#222',
+        padding: '10px',
+      }}
+    >
+      {label}
+    </div>
+  );
 });
