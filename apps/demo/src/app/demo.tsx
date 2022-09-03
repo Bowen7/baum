@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NdTree, useLayout, Node, Edge } from 'nd-tree';
 import './demo.css';
-const nodes: Node<{}>[] = [
+const nodes: Node[] = [
   { id: '1', label: '1111111' },
   { id: '2', label: '222' },
   { id: '3', label: '3333' },

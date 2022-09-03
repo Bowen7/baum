@@ -9,9 +9,10 @@ export type Box = {
   height: number;
 };
 
-export type Node<T> = T & {
+export type Node = {
   id: string;
   label?: string;
+  [key: string]: unknown;
 };
 
 export type Edge = {
@@ -20,7 +21,7 @@ export type Edge = {
   type?: string;
 };
 
-export type LaidoutNode<T> = Node<T> & {
+export type LaidoutNode = Node & {
   x: number;
   y: number;
 };

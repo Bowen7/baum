@@ -4,14 +4,14 @@ import { NodeContainer } from '../node';
 import { EdgeComponent } from '../edge';
 import { EdgesContainer } from '../edges-container';
 
-export type NdTreeProps<T> = {
-  nodes: LaidoutNode<T>[];
+export type NdTreeProps = {
+  nodes: LaidoutNode[];
   edges: LaidoutEdge[];
   onNodesResize?: (changes: Change[]) => void;
   size: Size;
 };
 
-export const NdTree = memo(<T,>(props: NdTreeProps<T>) => {
+export const NdTree = memo((props: NdTreeProps) => {
   const { size, nodes, edges, onNodesResize } = props;
   const [changes, setChanges] = useState<Change[]>([]);
 

@@ -73,7 +73,7 @@ const calcPosition = (
   return [size, positionMap];
 };
 
-export const useLayout = <T>(nodes: Node<T>[], edges: Edge[]) => {
+export const useLayout = (nodes: Node[], edges: Edge[]) => {
   const nodeSizeMap = useRef<Map<string, Size>>(new Map());
   const [positionMap, setPositionMap] = useState<Map<string, Position>>(
     () => new Map()
@@ -123,7 +123,7 @@ export const useLayout = <T>(nodes: Node<T>[], edges: Edge[]) => {
     setPositionMap(positionMap);
   };
 
-  const laidoutNodes: LaidoutNode<T>[] = useMemo(
+  const laidoutNodes: LaidoutNode[] = useMemo(
     () =>
       nodes.map((node) => {
         const [x, y] = positionMap.get(node.id) || [0, 0];
