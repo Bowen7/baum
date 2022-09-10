@@ -8,8 +8,8 @@ const cloneSourceMap = (map: Map<string, Set<string>>) => {
 };
 
 export class Graph {
-  protected nodes: Node[];
-  protected edges: Edge[];
+  nodes: Node[];
+  edges: Edge[];
   sourceMap: Map<string, Set<string>> = new Map();
   targetMap: Map<string, Set<string>> = new Map();
   rootIds: string[];

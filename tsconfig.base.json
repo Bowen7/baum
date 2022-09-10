@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@nd-tree/core": ["libs/core/src/index.ts"],
       "nd-tree": ["libs/nd-tree/src/index.ts"],
       "nd-tree-perfect-arrows": ["libs/nd-tree-perfect-arrows/src/index.ts"]
     }
