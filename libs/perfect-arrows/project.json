@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/nd-tree/src",
+  "sourceRoot": "libs/perfect-arrows/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -8,16 +8,16 @@
       "executor": "@nrwl/web:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/nd-tree",
-        "tsConfig": "libs/nd-tree/tsconfig.lib.json",
-        "project": "libs/nd-tree/package.json",
-        "entryFile": "libs/nd-tree/src/index.ts",
+        "outputPath": "dist/libs/perfect-arrows",
+        "tsConfig": "libs/perfect-arrows/tsconfig.lib.json",
+        "project": "libs/perfect-arrows/package.json",
+        "entryFile": "libs/perfect-arrows/src/index.ts",
         "external": ["react/jsx-runtime"],
         "rollupConfig": "@nrwl/react/plugins/bundle-rollup",
         "compiler": "babel",
         "assets": [
           {
-            "glob": "libs/nd-tree/README.md",
+            "glob": "libs/perfect-arrows/README.md",
             "input": ".",
             "output": "."
           }
@@ -28,14 +28,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/nd-tree/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["libs/perfect-arrows/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/nd-tree"],
+      "outputs": ["coverage/libs/perfect-arrows"],
       "options": {
-        "jestConfig": "libs/nd-tree/jest.config.ts",
+        "jestConfig": "libs/perfect-arrows/jest.config.ts",
         "passWithNoTests": true
       }
     }

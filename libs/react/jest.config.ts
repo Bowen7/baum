@@ -1,10 +1,10 @@
 /* eslint-disable */
 export default {
-  displayName: 'nd-tree',
+  displayName: 'react',
   preset: '../../jest.preset.js',
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/nd-tree',
+  coverageDirectory: '../../coverage/libs/react',
 };

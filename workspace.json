@@ -5,7 +5,7 @@
     "core": "libs/core",
     "demo": "apps/demo",
     "demo-e2e": "apps/demo-e2e",
-    "nd-tree": "libs/nd-tree",
-    "nd-tree-perfect-arrows": "libs/nd-tree-perfect-arrows"
+    "perfect-arrows": "libs/perfect-arrows",
+    "react": "libs/react"
   }
 }
