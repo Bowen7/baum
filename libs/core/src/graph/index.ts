@@ -12,13 +12,14 @@ export class Graph {
   edges: Edge[];
   sourceMap: Map<string, Set<string>> = new Map();
   targetMap: Map<string, Set<string>> = new Map();
-  rootIds: string[];
-  leafIds: string[];
   constructor(nodes: Node[], edges: Edge[]) {
     this.nodes = nodes;
     this.edges = edges;
     edges.forEach((edge) => {
-      const { source, target } = edge;
+      let { source, target } = edge;
+      if (edge.reversed) {
+        [target, source] = [source, target];
+      }
       if (!this.sourceMap.has(target)) {
         this.sourceMap.set(target, new Set([source]));
       }
@@ -28,9 +29,6 @@ export class Graph {
       this.sourceMap.get(target)!.add(source);
       this.targetMap.get(source)!.add(target);
     });
-    const ids = this.nodes.map((node) => node.id);
-    this.rootIds = ids.filter((id) => !this.sourceMap.has(id));
-    this.leafIds = ids.filter((id) => !this.targetMap.has(id));
   }
 
   clone() {
@@ -39,8 +37,18 @@ export class Graph {
     graph.edges = this.edges.slice();
     graph.sourceMap = cloneSourceMap(this.sourceMap);
     graph.targetMap = cloneSourceMap(this.targetMap);
-    graph.rootIds = this.rootIds.slice();
-    graph.leafIds = this.leafIds.slice();
     return graph;
+  }
+
+  get rootIds() {
+    return this.nodes
+      .map((node) => node.id)
+      .filter((id) => !this.sourceMap.has(id));
+  }
+
+  get leafIds() {
+    return this.nodes
+      .map((node) => node.id)
+      .filter((id) => !this.targetMap.has(id));
   }
 }

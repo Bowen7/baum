@@ -1,7 +1,9 @@
 import { Graph } from '../../graph';
-export const BergerShorFAS = (graph: Graph) => {
+import { setGraphMap, removeGraphMap } from './utils';
+
+export const bergerShorFAS = (graph: Graph) => {
   const g = graph.clone();
-  const edgeMap = new Map<string, string>();
+  const edgeMap = new Map<string, Set<string>>();
   g.nodes.forEach((node) => {
     const targeSet = g.targetMap.get(node.id);
     const sourceSet = g.sourceMap.get(node.id);
@@ -9,27 +11,28 @@ export const BergerShorFAS = (graph: Graph) => {
     const inDegree = sourceSet?.size || 0;
     if (outDegree >= inDegree) {
       if (targeSet) {
-        targeSet.forEach((target) => {
-          edgeMap.set(node.id, target);
-        });
+        setGraphMap(edgeMap, node.id, targeSet);
       }
     } else {
       if (sourceSet) {
-        sourceSet.forEach((source) => {
-          edgeMap.set(source, node.id);
-        });
+        setGraphMap(edgeMap, sourceSet, node.id);
       }
     }
     if (sourceSet) {
-      sourceSet.forEach((source) => {
-        g.targetMap.get(source)?.delete(node.id);
-      });
+      removeGraphMap(g.targetMap, sourceSet, node.id);
     }
     if (targeSet) {
-      targeSet.forEach((target) => {
-        g.sourceMap.get(target)?.delete(node.id);
-      });
+      removeGraphMap(g.sourceMap, targeSet, node.id);
     }
   });
-  const fas = g.edges.filter((edge) => !edgeMap.has(edge.source));
+
+  graph.edges = graph.edges.map((edge) => {
+    const { source, target } = edge;
+    if (edgeMap.get(source)?.has(target)) {
+      return edge;
+    }
+    removeGraphMap(graph.sourceMap, target, source);
+    removeGraphMap(graph.targetMap, source, target);
+    return { ...edge, reversed: true };
+  });
 };
