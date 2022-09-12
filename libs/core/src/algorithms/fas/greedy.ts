@@ -32,20 +32,20 @@ export const greedyFAS = (graph: Graph) => {
     let sink: string | null;
     while ((sink = getSink(g.sourceMap, g.targetMap))) {
       setGraphMap(edgeMap, g.sourceMap.get(sink)!, sink);
-      g.sourceMap.delete(sink);
+      g.removeEdgeFromMap(sink, 'target');
     }
 
     let source: string | null;
     while ((source = getSource(g.sourceMap, g.targetMap))) {
       setGraphMap(edgeMap, source, g.targetMap.get(source)!);
-      g.targetMap.delete(source);
+      g.removeEdgeFromMap(source, 'source');
     }
 
     if (g.sourceMap.size > 0 || g.targetMap.size > 0) {
       let maxDValue = -Infinity;
       let v: string;
       // TODO
-      for (const key in g.sourceMap) {
+      for (const [key] of g.sourceMap) {
         const dValue =
           g.sourceMap.get(key)?.size ?? 0 - g.targetMap.get(key)!.size ?? 0;
         if (dValue > maxDValue) {
@@ -54,6 +54,17 @@ export const greedyFAS = (graph: Graph) => {
         }
       }
       setGraphMap(edgeMap, v!, g.targetMap.get(v!)!);
+      g.removeEdgeFromMap(v!);
     }
   }
+
+  graph.edges = graph.edges.map((edge) => {
+    const { source, target } = edge;
+    if (edgeMap.get(source)?.has(target)) {
+      return edge;
+    }
+    removeGraphMap(graph.sourceMap, target, source);
+    removeGraphMap(graph.targetMap, source, target);
+    return { ...edge, reversed: true };
+  });
 };

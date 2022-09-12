@@ -1,5 +1,5 @@
 import { Node, Edge } from '../types';
-const cloneSourceMap = (map: Map<string, Set<string>>) => {
+const cloneGraphMap = (map: Map<string, Set<string>>) => {
   const newMap = new Map();
   map.forEach((value, key) => {
     newMap.set(key, new Set(value));
@@ -35,8 +35,8 @@ export class Graph {
     const graph = new Graph([], []);
     graph.nodes = this.nodes.slice();
     graph.edges = this.edges.slice();
-    graph.sourceMap = cloneSourceMap(this.sourceMap);
-    graph.targetMap = cloneSourceMap(this.targetMap);
+    graph.sourceMap = cloneGraphMap(this.sourceMap);
+    graph.targetMap = cloneGraphMap(this.targetMap);
     return graph;
   }
 
@@ -50,5 +50,29 @@ export class Graph {
     return this.nodes
       .map((node) => node.id)
       .filter((id) => !this.targetMap.has(id));
+  }
+
+  // remove edge from sourceMap or targetMap or sourceMap & targetMap
+  removeEdgeFromMap(nodeId: string, type: 'all' | 'target' | 'source' = 'all') {
+    // remove edge from sourceMap
+    if (type !== 'target') {
+      const sourceSet = this.sourceMap.get(nodeId);
+      if (sourceSet) {
+        sourceSet.forEach((source) => {
+          this.targetMap.get(source)?.delete(nodeId);
+        });
+        this.sourceMap.delete(nodeId);
+      }
+    }
+    // remove edge from targetMap
+    if (type !== 'source') {
+      const targetSet = this.targetMap.get(nodeId);
+      if (targetSet) {
+        targetSet.forEach((target) => {
+          this.sourceMap.get(target)?.delete(nodeId);
+        });
+        this.targetMap.delete(nodeId);
+      }
+    }
   }
 }
