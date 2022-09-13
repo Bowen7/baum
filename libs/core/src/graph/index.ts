@@ -12,6 +12,7 @@ export class Graph {
   edges: Edge[];
   sourceMap: Map<string, Set<string>> = new Map();
   targetMap: Map<string, Set<string>> = new Map();
+  rankMap: Map<string, number> = new Map();
   constructor(nodes: Node[], edges: Edge[]) {
     this.nodes = nodes;
     this.edges = edges;
