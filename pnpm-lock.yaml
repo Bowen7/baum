@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@babel/core': '>=7.8.0 <8.0.0'
+  '@datastructures-js/priority-queue': ^6.1.3
   '@nrwl/cli': 14.5.1
   '@nrwl/cypress': 14.5.1
   '@nrwl/eslint-plugin-nx': 14.5.1
@@ -43,6 +44,7 @@ specifiers:
   typescript: ~4.7.2
 
 dependencies:
+  '@datastructures-js/priority-queue': 6.1.3
   core-js: 3.24.0
   perfect-arrows: 0.3.7
   react: 18.2.0
@@ -1484,6 +1486,16 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@datastructures-js/heap/4.1.2:
+    resolution: {integrity: sha512-Dl6MPPVXxzWsSQxIaV0sOpAx/B8r7RYUO5/GWe7GhG9v9P4QfZ1cgPSq+SoF0QJFhu9G9TmtPfRLHPWzL73GpQ==}
+    dev: false
+
+  /@datastructures-js/priority-queue/6.1.3:
+    resolution: {integrity: sha512-zI0vOpxL0opXMpvLFS34Osw9ArM53Th5+GmNUB0zXwhQN5k8r9miNBrJYgTasAkW+WFtuzU++2dPhS1n4HDG2w==}
+    dependencies:
+      '@datastructures-js/heap': 4.1.2
+    dev: false
 
   /@eslint/eslintrc/1.3.0:
     resolution: {integrity: sha512-UWW0TMTmk2d7hLcWD1/e2g5HDM/HQ3csaLSqXCfqwh4uNDuNqlaKWXmEsL4Cs41Z0KnILNvwbHAah3C2yt06kw==}
