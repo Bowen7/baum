@@ -1,6 +1,7 @@
 import { PriorityQueue } from '@datastructures-js/priority-queue';
 import { Graph } from '../../graph';
 
+// https://stackoverflow.com/a/16357676/19427123
 export const transitiveReduction = (graph: Graph) => {
   const { nodes, sourceMap, targetMap } = graph;
   nodes.forEach(({ id: i }) => {
@@ -40,6 +41,7 @@ const compare = (item1: QueueItem, item2: QueueItem) => {
 
 // TODO: optional maxWidth
 // how to calculate a proper maxWidth?
+// https://en.wikipedia.org/wiki/Coffman%E2%80%93Graham_algorithm
 export const coffmanGraham = (graph: Graph, maxWidth: number) => {
   const { rankMap } = graph;
   const g = graph.clone();
