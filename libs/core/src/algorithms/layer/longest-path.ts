@@ -1,9 +1,9 @@
 import { Graph } from '../../graph';
 
 export const longestPath = (graph: Graph) => {
-  const rootIds = graph.rootIds;
+  const roots = graph.roots;
   let rank = 0;
-  let ids: string[] = rootIds;
+  let ids: string[] = roots;
   let nextIds: string[] = [];
   while (ids.length && nextIds.length) {
     if (ids.length === 0) {
@@ -11,9 +11,8 @@ export const longestPath = (graph: Graph) => {
       ids = nextIds;
       nextIds = [];
     }
-    const id = ids.pop();
-    graph.rankMap.set(id!, rank);
-    const targetSet = graph.targetMap.get(id!)!;
-    nextIds.push(...targetSet);
+    const id = ids.pop()!;
+    graph.rankMap.set(id, rank);
+    nextIds.push(...graph.targets(id));
   }
 };

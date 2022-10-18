@@ -72,6 +72,10 @@ export const feasibleTree = (graph: Graph) => {
   }
 };
 
+const initCutValues = (graph: Graph) => {
+  const map = new Map<string, number>();
+};
+
 export const networkSimplex = (graph: Graph) => {
   // TODO
 };

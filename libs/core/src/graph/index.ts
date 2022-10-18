@@ -1,5 +1,4 @@
 import { Node, Edge } from '../types';
-
 export class Graph {
   nodeSet: Set<Node> = new Set();
   edgeSet: Set<Edge> = new Set();
@@ -75,6 +74,22 @@ export class Graph {
   targetEdges(id: string) {
     const targets = this.targetMap.get(id);
     return [...(targets ?? []).values()];
+  }
+
+  sources(id: string) {
+    return [...(this.sourceMap.get(id)?.keys() ?? [])];
+  }
+
+  targets(id: string) {
+    return [...(this.targetMap.get(id)?.keys() ?? [])];
+  }
+
+  sourceSize(id: string) {
+    return this.sourceMap.get(id)?.size ?? 0;
+  }
+
+  targetSize(id: string) {
+    return this.targetMap.get(id)?.size ?? 0;
   }
 
   reverseEdge(edge: Edge) {

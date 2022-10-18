@@ -3,11 +3,11 @@ import { Graph } from '../../graph';
 
 // https://stackoverflow.com/a/16357676/19427123
 export const transitiveReduction = (graph: Graph) => {
-  const { nodes, sourceMap, targetMap } = graph;
-  nodes.forEach(({ id: i }) => {
-    nodes.forEach(({ id: j }) => {
+  const { nodeSet, sourceMap, targetMap } = graph;
+  nodeSet.forEach(({ id: i }) => {
+    nodeSet.forEach(({ id: j }) => {
       if (targetMap.get(i)?.has(j)) {
-        nodes.forEach(({ id: k }) => {
+        nodeSet.forEach(({ id: k }) => {
           if (targetMap.get(j)?.has(k)) {
             if (targetMap.get(i)?.has(k)) {
               targetMap.get(i)?.delete(k);
@@ -46,22 +46,21 @@ export const coffmanGraham = (graph: Graph, maxWidth: number) => {
   const { rankMap } = graph;
   const g = graph.clone();
   transitiveReduction(g);
-  const { sourceMap, targetMap } = g;
-  const rootIds = graph.rootIds;
+  const roots = graph.roots;
   const queue = new PriorityQueue(compare);
   const sourceIndicesMap = new Map<string, number[]>();
   let index = 0;
   let layer = 0;
   let width = 0;
 
-  rootIds.forEach((id) => {
+  roots.forEach((id) => {
     queue.enqueue({ id, sourceIndices: [] });
   });
 
   while (!queue.isEmpty()) {
     const { id } = queue.dequeue();
     let leastLayer = 0;
-    sourceMap.get(id)?.forEach((source) => {
+    g.sources(id).forEach((source) => {
       leastLayer = Math.max(leastLayer, rankMap.get(source)! + 1);
     });
     if (leastLayer <= layer && width < maxWidth) {
@@ -72,13 +71,13 @@ export const coffmanGraham = (graph: Graph, maxWidth: number) => {
       rankMap.set(id, layer);
       width = 1;
     }
-    targetMap.get(id)?.forEach((target) => {
+    g.targets(id).forEach((target) => {
       if (!sourceIndicesMap.has(target)) {
         sourceIndicesMap.set(target, []);
       }
       const sourceIndices = sourceIndicesMap.get(target)!;
       sourceIndices.push(index);
-      if (sourceIndices.length === sourceMap.get(target)?.size ?? 0) {
+      if (sourceIndices.length === g.sourceSize(target)) {
         queue.enqueue({ id: target, sourceIndices });
       }
     });

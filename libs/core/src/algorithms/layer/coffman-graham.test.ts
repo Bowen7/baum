@@ -12,12 +12,12 @@ describe('Coffman-Graham', () => {
         { id: '5' },
       ],
       [
-        { source: '0', target: '1', reversed: false },
-        { source: '0', target: '2', reversed: false },
-        { source: '0', target: '4', reversed: false },
-        { source: '1', target: '3', reversed: false },
-        { source: '2', target: '3', reversed: false },
-        { source: '4', target: '5', reversed: false },
+        { source: '0', target: '1' },
+        { source: '0', target: '2' },
+        { source: '0', target: '4' },
+        { source: '1', target: '3' },
+        { source: '2', target: '3' },
+        { source: '4', target: '5' },
       ]
     );
     coffmanGraham(graph, 2);

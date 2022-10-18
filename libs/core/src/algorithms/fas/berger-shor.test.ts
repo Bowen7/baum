@@ -5,16 +5,16 @@ describe('Berger-Shor FAS', () => {
     const graph = new Graph(
       [{ id: '1' }, { id: '2' }],
       [
-        { source: '1', target: '2', reversed: false },
-        { source: '2', target: '1', reversed: false },
+        { source: '1', target: '2' },
+        { source: '2', target: '1' },
       ]
     );
     bergerShorFAS(graph);
     const expectedGraph = new Graph(
       [{ id: '1' }, { id: '2' }],
       [
-        { source: '1', target: '2', reversed: false },
-        { source: '2', target: '1', reversed: true },
+        { source: '1', target: '2' },
+        { source: '2', target: '1' },
       ]
     );
     expect(graph).toEqual(expectedGraph);
