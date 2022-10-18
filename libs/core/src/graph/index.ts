@@ -1,13 +1,12 @@
 import { Node, Edge } from '../types';
 
-const getId = (nodeOrId: Node | string) =>
-  typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
 export class Graph {
   nodeSet: Set<Node> = new Set();
   edgeSet: Set<Edge> = new Set();
   sourceMap: Map<string, Map<string, Edge>> = new Map();
   targetMap: Map<string, Map<string, Edge>> = new Map();
   rankMap: Map<string, number> = new Map();
+  reversedEdgeSet: Set<Edge> = new Set();
   constructor(nodes: Node[], edges: Edge[]) {
     nodes.forEach((node) => this.addNode(node));
     edges.forEach((edge) => this.addEdge(edge));
@@ -38,17 +37,17 @@ export class Graph {
   }
 
   get roots() {
-    const roots: Node[] = [];
+    const roots: string[] = [];
     this.nodeSet.forEach(
-      (node) => !this.sourceMap.has(node.id) && roots.push(node)
+      (node) => !this.sourceMap.has(node.id) && roots.push(node.id)
     );
     return roots;
   }
 
   get leaves() {
-    const leaves: Node[] = [];
+    const leaves: string[] = [];
     this.nodeSet.forEach(
-      (node) => !this.targetMap.has(node.id) && leaves.push(node)
+      (node) => !this.targetMap.has(node.id) && leaves.push(node.id)
     );
     return leaves;
   }
@@ -60,29 +59,51 @@ export class Graph {
     this.targetMap.get(source)?.delete(target);
   }
 
-  edges(nodeOrId: Node | string) {
-    return [...this.sourceEdges(nodeOrId), ...this.targetEdges(nodeOrId)];
+  edges(id: string) {
+    return [...this.sourceEdges(id), ...this.targetEdges(id)];
   }
 
   removeEdges(edges: Edge[]) {
     edges.forEach((edge) => this.removeEdge(edge));
   }
 
-  sourceEdges(nodeOrId: Node | string) {
-    const sources = this.sourceMap.get(getId(nodeOrId));
-    return [...sources!.values()];
+  sourceEdges(id: string) {
+    const sources = this.sourceMap.get(id);
+    return [...(sources ?? []).values()];
   }
 
-  targetEdges(nodeOrId: Node | string) {
-    const targets = this.targetMap.get(getId(nodeOrId));
-    return [...targets!.values()];
+  targetEdges(id: string) {
+    const targets = this.targetMap.get(id);
+    return [...(targets ?? []).values()];
   }
 
-  sourceIds(nodeOrId: Node | string) {
-    return [...(this.sourceMap.get(getId(nodeOrId)) ?? []).keys()];
+  reverseEdge(edge: Edge) {
+    this.removeEdge(edge);
+    const { source, target } = edge;
+    edge.source = target;
+    edge.target = source;
+    this.addEdge(edge);
+    if (this.reversedEdgeSet.has(edge)) {
+      this.reversedEdgeSet.delete(edge);
+    } else {
+      this.reversedEdgeSet.add(edge);
+    }
   }
 
-  targetIds(nodeOrId: Node | string) {
-    return [...(this.targetMap.get(getId(nodeOrId)) ?? []).keys()];
+  postOrder(callback: (id: string) => void) {
+    const stack = this.leaves;
+    const visited = new Set<string>();
+    while (stack.length) {
+      const id = stack[stack.length - 1];
+      const children = [...(this.targetMap.get(id) ?? []).keys()] as string[];
+      if (children.length === 0 || visited.has(id)) {
+        stack.pop();
+        callback(id);
+        continue;
+      }
+
+      children.forEach((child) => stack.push(child));
+      visited.add(id);
+    }
   }
 }

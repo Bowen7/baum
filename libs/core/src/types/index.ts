@@ -6,5 +6,4 @@ export type Node = {
 export type Edge = {
   source: string;
   target: string;
-  reversed: boolean;
 };

@@ -1,47 +1,25 @@
 import { Graph } from '../../graph';
-import { setGraphMap, removeGraphMap } from './utils';
-
-const getSink = (
-  sourceMap: Map<string, Set<string>>,
-  targetMap: Map<string, Set<string>>
-) => {
-  for (const key in sourceMap) {
-    if (!targetMap.has(key)) {
-      return key;
-    }
-  }
-  return null;
-};
-
-const getSource = (
-  sourceMap: Map<string, Set<string>>,
-  targetMap: Map<string, Set<string>>
-) => {
-  for (const key in targetMap) {
-    if (!sourceMap.has(key)) {
-      return key;
-    }
-  }
-  return null;
-};
+import { Edge } from '../../types';
 
 export const greedyFAS = (graph: Graph) => {
   const g = graph.clone();
-  const edgeMap = new Map<string, Set<string>>();
-  while (g.sourceMap.size > 0 || g.targetMap.size > 0) {
+  const edgeSet = new Set<Edge>();
+  while (g.edgeSet.size > 0) {
     let sink: string | null;
-    while ((sink = getSink(g.sourceMap, g.targetMap))) {
-      setGraphMap(edgeMap, g.sourceMap.get(sink)!, sink);
-      g.removeEdgeFromMap(sink, 'target');
+    while ((sink = g.roots[0])) {
+      const sourceEdges = g.sourceEdges(sink);
+      sourceEdges.forEach((edge) => edgeSet.add(edge));
+      g.removeEdges(sourceEdges);
     }
 
     let source: string | null;
-    while ((source = getSource(g.sourceMap, g.targetMap))) {
-      setGraphMap(edgeMap, source, g.targetMap.get(source)!);
-      g.removeEdgeFromMap(source, 'source');
+    while ((source = g.leaves[0])) {
+      const targetEdges = g.targetEdges(source);
+      targetEdges.forEach((edge) => edgeSet.add(edge));
+      g.removeEdges(targetEdges);
     }
 
-    if (g.sourceMap.size > 0 || g.targetMap.size > 0) {
+    if (g.edgeSet.size > 0) {
       let maxDValue = -Infinity;
       let v: string;
       // TODO
@@ -53,18 +31,15 @@ export const greedyFAS = (graph: Graph) => {
           v = key;
         }
       }
-      setGraphMap(edgeMap, v!, g.targetMap.get(v!)!);
-      g.removeEdgeFromMap(v!);
+      g.targetEdges(v!).forEach((edge) => edgeSet.add(edge));
+      g.removeEdges(g.edges(v!));
     }
   }
 
-  graph.edges = graph.edges.map((edge) => {
-    const { source, target } = edge;
-    if (edgeMap.get(source)?.has(target)) {
-      return edge;
+  graph.edgeSet.forEach((edge) => {
+    if (edgeSet.has(edge)) {
+      return;
     }
-    removeGraphMap(graph.sourceMap, target, source);
-    removeGraphMap(graph.targetMap, source, target);
-    return { ...edge, reversed: true };
+    graph.reverseEdge(edge);
   });
 };
