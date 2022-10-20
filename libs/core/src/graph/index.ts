@@ -28,6 +28,10 @@ export class Graph {
     this.targetMap.get(source)!.set(target, edge);
   }
 
+  nodes() {
+    return [...this.nodeSet];
+  }
+
   clone() {
     const graph = new Graph([], []);
     this.nodeSet.forEach((node) => graph.addNode(node));
@@ -58,7 +62,10 @@ export class Graph {
     this.targetMap.get(source)?.delete(target);
   }
 
-  edges(id: string) {
+  edges(id?: string) {
+    if (id === undefined) {
+      return [...this.edgeSet];
+    }
     return [...this.sourceEdges(id), ...this.targetEdges(id)];
   }
 
@@ -102,23 +109,6 @@ export class Graph {
       this.reversedEdgeSet.delete(edge);
     } else {
       this.reversedEdgeSet.add(edge);
-    }
-  }
-
-  postOrder(callback: (id: string) => void) {
-    const stack = this.leaves;
-    const visited = new Set<string>();
-    while (stack.length) {
-      const id = stack[stack.length - 1];
-      const children = [...(this.targetMap.get(id) ?? []).keys()] as string[];
-      if (children.length === 0 || visited.has(id)) {
-        stack.pop();
-        callback(id);
-        continue;
-      }
-
-      children.forEach((child) => stack.push(child));
-      visited.add(id);
     }
   }
 }
