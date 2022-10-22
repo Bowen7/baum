@@ -4,7 +4,7 @@ import { Edge } from '../../types';
 export const bergerShorFAS = (graph: Graph) => {
   const g = graph.clone();
   const edgeSet = new Set<Edge>();
-  g.nodeSet.forEach((node) => {
+  g.nodes.forEach((node) => {
     const targetEdges = g.targetEdges(node.id);
     const sourceEdges = g.sourceEdges(node.id);
     const outDegree = targetEdges.length;

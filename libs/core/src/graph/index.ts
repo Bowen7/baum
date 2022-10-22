@@ -1,18 +1,21 @@
 import { Node, Edge } from '../types';
+
+const getId = (node: Node | string) =>
+  typeof node === 'string' ? node : node.id;
 export class Graph {
-  nodeSet: Set<Node> = new Set();
+  nodeMap: Map<string, Node> = new Map();
   edgeSet: Set<Edge> = new Set();
   sourceMap: Map<string, Map<string, Edge>> = new Map();
   targetMap: Map<string, Map<string, Edge>> = new Map();
   rankMap: Map<string, number> = new Map();
   reversedEdgeSet: Set<Edge> = new Set();
-  constructor(nodes: Node[], edges: Edge[]) {
+  constructor(nodes: Node[] = [], edges: Edge[] = []) {
     nodes.forEach((node) => this.addNode(node));
     edges.forEach((edge) => this.addEdge(edge));
   }
 
   addNode(node: Node) {
-    this.nodeSet.add(node);
+    this.nodeMap.set(node.id, node);
   }
 
   addEdge(edge: Edge) {
@@ -28,20 +31,32 @@ export class Graph {
     this.targetMap.get(source)!.set(target, edge);
   }
 
-  nodes() {
-    return [...this.nodeSet];
+  get nodes() {
+    return [...this.nodeMap.values()];
+  }
+
+  node(id: string) {
+    return this.nodeMap.get(id);
   }
 
   clone() {
     const graph = new Graph([], []);
-    this.nodeSet.forEach((node) => graph.addNode(node));
+    this.nodes.forEach((node) => graph.addNode(node));
     this.edgeSet.forEach((edge) => graph.addEdge(edge));
     return graph;
   }
 
+  hasNode(node: string | Node) {
+    return this.nodeMap.has(getId(node));
+  }
+
+  hasEdge(source: string, target: string) {
+    return this.sourceMap.get(target)?.has(source) ?? false;
+  }
+
   get roots() {
     const roots: string[] = [];
-    this.nodeSet.forEach(
+    this.nodes.forEach(
       (node) => !this.sourceMap.has(node.id) && roots.push(node.id)
     );
     return roots;
@@ -49,7 +64,7 @@ export class Graph {
 
   get leaves() {
     const leaves: string[] = [];
-    this.nodeSet.forEach(
+    this.nodes.forEach(
       (node) => !this.targetMap.has(node.id) && leaves.push(node.id)
     );
     return leaves;
@@ -99,6 +114,10 @@ export class Graph {
     return this.targetMap.get(id)?.size ?? 0;
   }
 
+  get nodeSize() {
+    return this.nodeMap.size;
+  }
+
   reverseEdge(edge: Edge) {
     this.removeEdge(edge);
     const { source, target } = edge;
@@ -110,5 +129,13 @@ export class Graph {
     } else {
       this.reversedEdgeSet.add(edge);
     }
+  }
+
+  getRank(node: string | Node) {
+    return this.rankMap.get(getId(node));
+  }
+
+  setRank(node: string | Node, rank: number) {
+    return this.rankMap.set(getId(node), rank);
   }
 }

@@ -8,66 +8,66 @@ import { longestPath } from './longest-path';
 const MIN_LEN = 1;
 
 // the slack of an edge is the difference of its length and its minimum length
-const getEdgeSlack = (graph: Graph, source: string, target: string) => {
-  const { rankMap } = graph;
-  return rankMap.get(target)! - rankMap.get(source)! - MIN_LEN;
-};
+const getEdgeSlack = (graph: Graph, source: string, target: string) =>
+  graph.getRank(target)! - graph.getRank(source)! - MIN_LEN;
 
-const getMinimalSlackEdge = (graph: Graph, tightNodeSet: Set<string>) =>
-  graph.edges
-    .filter(
-      ({ source, target }) =>
-        tightNodeSet.has(source) !== tightNodeSet.has(target)
-    )
-    .reduce(
-      ([minEdge, minSlack]: [Edge | null, number], edge: Edge) => {
-        const slack = getEdgeSlack(graph, edge.source, edge.target);
-        if (slack < minSlack) {
-          return [edge, slack] as [Edge | null, number];
-        }
-        return [minEdge, minSlack] as [Edge | null, number];
-      },
-      [null, Infinity]
-    );
+const getMinimalSlackEdge = (
+  graph: Graph,
+  tightGraph: Graph
+): [number, Edge] => {
+  let minSlack = Infinity;
+  let minEdge: Edge;
+  // TODO: performance
+  graph.edges().forEach((edge) => {
+    const { source, target } = edge;
+    if (tightGraph.hasEdge(source, target)) {
+      return;
+    }
+    const slack = getEdgeSlack(graph, source, target);
+    if (slack < minSlack) {
+      minSlack = slack;
+      minEdge = edge;
+    }
+  });
+  return [minSlack, minEdge!];
+};
 
 // an edge is tight if its slack is zero
 // return tight tree node size
-const tightTree = (graph: Graph, tightNodeSet: Set<string>) => {
+const getTightTreeSize = (graph: Graph, tightGraph: Graph) => {
   const dfs = (id: string) => {
-    const sources = graph.sourceMap.get(id);
-    const targets = graph.targetMap.get(id);
-    if (sources) {
-      sources.forEach((source) => {
-        if (getEdgeSlack(graph, source, id) === 0) {
-          tightNodeSet.add(source);
-          dfs(source);
-        }
-      });
-    }
-    if (targets) {
-      targets.forEach((target) => {
-        if (getEdgeSlack(graph, id, target) === 0) {
-          tightNodeSet.add(target);
-          dfs(target);
-        }
-      });
-    }
+    const sources = graph.sources(id);
+    const targets = graph.targets(id);
+    sources.forEach((source) => {
+      if (getEdgeSlack(graph, source, id) === 0) {
+        tightGraph.addNode(graph.node(source)!);
+        tightGraph.addEdge({ source, target: id });
+        dfs(source);
+      }
+    });
+    targets.forEach((target) => {
+      if (getEdgeSlack(graph, id, target) === 0) {
+        tightGraph.addNode(graph.node(target)!);
+        tightGraph.addEdge({ source: id, target });
+        dfs(target);
+      }
+    });
   };
-  tightNodeSet.forEach((id) => dfs(id));
-  return tightNodeSet.size;
+  tightGraph.nodes.forEach(({ id }) => dfs(id));
+  return tightGraph.nodeSize;
 };
 
 export const feasibleTree = (graph: Graph) => {
   // use longest path algorithm to init rank
   longestPath(graph);
-  const tightNodeSet = new Set<string>();
-  tightNodeSet.add(graph.nodes[0].id);
-  while (tightTree(graph, tightNodeSet) !== graph.nodes.length) {
-    const [edge, slack] = getMinimalSlackEdge(graph, tightNodeSet);
-    if (tightNodeSet.has(edge!.source)) {
-      graph.rankMap.set(edge!.target, graph.rankMap.get(edge!.target)! - slack);
+  const tightGraph = new Graph();
+  tightGraph.addNode(graph.nodes[0]);
+  while (getTightTreeSize(graph, tightGraph) !== graph.nodeSize) {
+    const [slack, edge] = getMinimalSlackEdge(graph, tightGraph);
+    if (tightGraph.hasNode(edge!.source)) {
+      graph.setRank(edge!.target, graph.getRank(edge!.target)! - slack);
     } else {
-      graph.rankMap.set(edge!.source, graph.rankMap.get(edge!.source)! + slack);
+      graph.setRank(edge!.source, graph.getRank(edge!.source)! + slack);
     }
   }
 };

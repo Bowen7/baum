@@ -3,11 +3,12 @@ import { Graph } from '../../graph';
 
 // https://stackoverflow.com/a/16357676/19427123
 export const transitiveReduction = (graph: Graph) => {
-  const { nodeSet, sourceMap, targetMap } = graph;
-  nodeSet.forEach(({ id: i }) => {
-    nodeSet.forEach(({ id: j }) => {
+  const { sourceMap, targetMap } = graph;
+  const nodes = graph.nodes;
+  nodes.forEach(({ id: i }) => {
+    nodes.forEach(({ id: j }) => {
       if (targetMap.get(i)?.has(j)) {
-        nodeSet.forEach(({ id: k }) => {
+        nodes.forEach(({ id: k }) => {
           if (targetMap.get(j)?.has(k)) {
             if (targetMap.get(i)?.has(k)) {
               targetMap.get(i)?.delete(k);
