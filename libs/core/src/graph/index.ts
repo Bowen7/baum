@@ -1,4 +1,5 @@
 import { Node, Edge } from '../types';
+export * from './utils';
 
 const getId = (node: Node | string) =>
   typeof node === 'string' ? node : node.id;

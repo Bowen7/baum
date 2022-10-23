@@ -1,4 +1,4 @@
-import { Graph } from '../../graph';
+import { Graph, postOrder } from '../../graph';
 import { Edge } from '../../types';
 import { longestPath } from './longest-path';
 // https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=221135
@@ -70,12 +70,35 @@ export const feasibleTree = (graph: Graph) => {
       graph.setRank(edge!.source, graph.getRank(edge!.source)! + slack);
     }
   }
+  return tightGraph;
 };
 
-const initCutValues = (graph: Graph) => {
-  const map = new Map<string, number>();
+const initLowsLims = (tightGraph: Graph) => {
+  const limMap = new Map<string, number>();
+  const lowMap = new Map<string, number>();
+  let lim = 0;
+  postOrder(tightGraph, (id) => {
+    limMap.set(id, lim++);
+    const targets = tightGraph.targets(id);
+    if (targets.length === 0) {
+      lowMap.set(id, lim - 1);
+    } else {
+      lowMap.set(id, Math.min(...targets.map((target) => limMap.get(target)!)));
+    }
+  });
+  return [lowMap, limMap];
 };
+
+const leaveEdge = (graph: Graph, tightGraph: Graph): Edge | undefined => {};
+
+const enterEdge = (graph: Graph, tightGraph: Graph): Edge => {};
+
+const exchange = (edge1: Edge, edge2: Edge) => {};
 
 export const networkSimplex = (graph: Graph) => {
-  // TODO
+  const tightGraph = feasibleTree(graph);
+  let edge: Edge | undefined;
+  while ((edge = leaveEdge(graph, tightGraph))) {
+    exchange(edge, enterEdge(graph, tightGraph));
+  }
 };
