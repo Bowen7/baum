@@ -21,7 +21,7 @@ describe('Coffman-Graham', () => {
       ]
     );
     coffmanGraham(graph, 2);
-    const expectedRankMap = new Map([
+    const expectednodeRankMap = new Map([
       ['0', 0],
       ['1', 1],
       ['2', 2],
@@ -29,6 +29,6 @@ describe('Coffman-Graham', () => {
       ['4', 1],
       ['5', 2],
     ]);
-    expect(graph.rankMap).toEqual(expectedRankMap);
+    expect(graph.nodeRankMap).toEqual(expectednodeRankMap);
   });
 });

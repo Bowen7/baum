@@ -74,8 +74,8 @@ export const feasibleTree = (graph: Graph) => {
 };
 
 const initLowsLims = (tightGraph: Graph) => {
-  const limMap = new Map<string, number>();
   const lowMap = new Map<string, number>();
+  const limMap = new Map<string, number>();
   let lim = 0;
   postOrder(tightGraph, (id) => {
     limMap.set(id, lim++);
@@ -87,6 +87,10 @@ const initLowsLims = (tightGraph: Graph) => {
     }
   });
   return [lowMap, limMap];
+};
+
+const initCutValues = (graph: Graph, tightGraph: Graph) => {
+  const [lowMap, limMap] = initLowsLims(tightGraph);
 };
 
 const leaveEdge = (graph: Graph, tightGraph: Graph): Edge | undefined => {};

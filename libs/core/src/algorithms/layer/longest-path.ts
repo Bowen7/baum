@@ -12,7 +12,7 @@ export const longestPath = (graph: Graph) => {
       nextIds = [];
     }
     const id = ids.pop()!;
-    graph.rankMap.set(id, rank);
+    graph.nodeRankMap.set(id, rank);
     nextIds.push(...graph.targets(id));
   }
 };

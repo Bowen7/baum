@@ -8,7 +8,7 @@ export class Graph {
   edgeSet: Set<Edge> = new Set();
   sourceMap: Map<string, Map<string, Edge>> = new Map();
   targetMap: Map<string, Map<string, Edge>> = new Map();
-  rankMap: Map<string, number> = new Map();
+  nodeRankMap: Map<string, number> = new Map();
   reversedEdgeSet: Set<Edge> = new Set();
   constructor(nodes: Node[] = [], edges: Edge[] = []) {
     nodes.forEach((node) => this.addNode(node));
@@ -133,10 +133,10 @@ export class Graph {
   }
 
   getRank(node: string | Node) {
-    return this.rankMap.get(getId(node));
+    return this.nodeRankMap.get(getId(node));
   }
 
   setRank(node: string | Node, rank: number) {
-    return this.rankMap.set(getId(node), rank);
+    return this.nodeRankMap.set(getId(node), rank);
   }
 }

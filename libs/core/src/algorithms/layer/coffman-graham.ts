@@ -44,7 +44,7 @@ const compare = (item1: QueueItem, item2: QueueItem) => {
 // how to calculate a proper maxWidth?
 // https://en.wikipedia.org/wiki/Coffman%E2%80%93Graham_algorithm
 export const coffmanGraham = (graph: Graph, maxWidth: number) => {
-  const { rankMap } = graph;
+  const { nodeRankMap } = graph;
   const g = graph.clone();
   transitiveReduction(g);
   const roots = graph.roots;
@@ -62,14 +62,14 @@ export const coffmanGraham = (graph: Graph, maxWidth: number) => {
     const { id } = queue.dequeue();
     let leastLayer = 0;
     g.sources(id).forEach((source) => {
-      leastLayer = Math.max(leastLayer, rankMap.get(source)! + 1);
+      leastLayer = Math.max(leastLayer, nodeRankMap.get(source)! + 1);
     });
     if (leastLayer <= layer && width < maxWidth) {
-      rankMap.set(id, layer);
+      nodeRankMap.set(id, layer);
       width++;
     } else {
       layer = Math.max(layer + 1, leastLayer);
-      rankMap.set(id, layer);
+      nodeRankMap.set(id, layer);
       width = 1;
     }
     g.targets(id).forEach((target) => {
