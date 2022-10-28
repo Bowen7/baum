@@ -51,8 +51,12 @@ export class Graph {
     return this.nodeMap.has(getId(node));
   }
 
-  hasEdge(source: string, target: string) {
-    return this.sourceMap.get(target)?.has(source) ?? false;
+  // TODO
+  hasEdge(source: string | Edge, target?: string) {
+    if (typeof source === 'string') {
+      return this.sourceMap.get(target!)?.has(source) ?? false;
+    }
+    return this.edgeSet.has(source);
   }
 
   get roots() {

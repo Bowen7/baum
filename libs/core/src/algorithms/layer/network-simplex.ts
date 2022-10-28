@@ -1,6 +1,7 @@
 import { Graph, postOrder } from '../../graph';
 import { Edge } from '../../types';
 import { longestPath } from './longest-path';
+import { bfs } from '../../graph/utils';
 // https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=221135
 
 // in the simplest case,
@@ -90,7 +91,23 @@ const initLowsLims = (tightGraph: Graph) => {
 };
 
 const initCutValues = (graph: Graph, tightGraph: Graph) => {
-  const [lowMap, limMap] = initLowsLims(tightGraph);
+  const cutValueMap = new Map<Edge, number>();
+  bfs(tightGraph, (id: string) => {
+    const sourceEdges = tightGraph.sourceEdges(id);
+    const targetEdges = tightGraph.targetEdges(id);
+    const targetSize = targetEdges.length;
+    targetEdges.forEach((edge) => {
+      let cutValue = targetSize;
+      sourceEdges.forEach((sourceEdge) => {
+        cutValue--;
+        if (tightGraph.hasEdge(sourceEdge)) {
+          cutValue += cutValueMap.get(sourceEdge)!;
+        }
+      });
+      cutValueMap.set(edge, cutValue);
+    });
+  });
+  return cutValueMap;
 };
 
 const leaveEdge = (graph: Graph, tightGraph: Graph): Edge | undefined => {};
