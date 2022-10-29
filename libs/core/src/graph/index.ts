@@ -3,6 +3,9 @@ export * from './utils';
 
 const getId = (node: Node | string) =>
   typeof node === 'string' ? node : node.id;
+
+// TODO
+class TinyGraph {}
 export class Graph {
   nodeMap: Map<string, Node> = new Map();
   edgeSet: Set<Edge> = new Set();
@@ -51,12 +54,8 @@ export class Graph {
     return this.nodeMap.has(getId(node));
   }
 
-  // TODO
-  hasEdge(source: string | Edge, target?: string) {
-    if (typeof source === 'string') {
-      return this.sourceMap.get(target!)?.has(source) ?? false;
-    }
-    return this.edgeSet.has(source);
+  hasEdge(source: string, target: string) {
+    return this.sourceMap.get(target)?.has(source) ?? false;
   }
 
   get roots() {

@@ -18,7 +18,6 @@ const getMinimalSlackEdge = (
 ): [number, Edge] => {
   let minSlack = Infinity;
   let minEdge: Edge;
-  // TODO: performance
   graph.edges().forEach((edge) => {
     const { source, target } = edge;
     if (tightGraph.hasEdge(source, target)) {
@@ -93,14 +92,15 @@ const initLowsLims = (tightGraph: Graph) => {
 const initCutValues = (graph: Graph, tightGraph: Graph) => {
   const cutValueMap = new Map<Edge, number>();
   bfs(tightGraph, (id: string) => {
-    const sourceEdges = tightGraph.sourceEdges(id);
-    const targetEdges = tightGraph.targetEdges(id);
+    const sourceEdges = graph.sourceEdges(id);
+    const targetEdges = graph.targetEdges(id);
     const targetSize = targetEdges.length;
     targetEdges.forEach((edge) => {
       let cutValue = targetSize;
       sourceEdges.forEach((sourceEdge) => {
         cutValue--;
-        if (tightGraph.hasEdge(sourceEdge)) {
+        const { source, target } = sourceEdge;
+        if (tightGraph.hasEdge(source, target)) {
           cutValue += cutValueMap.get(sourceEdge)!;
         }
       });
@@ -110,7 +110,15 @@ const initCutValues = (graph: Graph, tightGraph: Graph) => {
   return cutValueMap;
 };
 
-const leaveEdge = (graph: Graph, tightGraph: Graph): Edge | undefined => {};
+const leaveEdge = (graph: Graph, tightGraph: Graph): Edge | null => {
+  const cutValueMap = initCutValues(graph, tightGraph);
+  for (const [edge, cutValue] of cutValueMap) {
+    if (cutValue < 0) {
+      return edge;
+    }
+  }
+  return null;
+};
 
 const enterEdge = (graph: Graph, tightGraph: Graph): Edge => {};
 
@@ -118,7 +126,7 @@ const exchange = (edge1: Edge, edge2: Edge) => {};
 
 export const networkSimplex = (graph: Graph) => {
   const tightGraph = feasibleTree(graph);
-  let edge: Edge | undefined;
+  let edge: Edge | null = null;
   while ((edge = leaveEdge(graph, tightGraph))) {
     exchange(edge, enterEdge(graph, tightGraph));
   }
