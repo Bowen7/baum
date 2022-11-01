@@ -1,3 +1,4 @@
+import minBy from 'lodash/minBy';
 import { Graph, postOrder } from '../../graph';
 import { Edge } from '../../types';
 import { longestPath } from './longest-path';
@@ -120,7 +121,27 @@ const leaveEdge = (graph: Graph, tightGraph: Graph): Edge | null => {
   return null;
 };
 
-const enterEdge = (graph: Graph, tightGraph: Graph): Edge => {};
+const enterEdge = (graph: Graph, tightGraph: Graph, edge: Edge): Edge => {
+  const [lowMap, limMap] = initLowsLims(tightGraph);
+
+  const isTailComponent = (node: string, edge: Edge) => {
+    const { source, target } = edge;
+    return (
+      limMap.get(source)! < limMap.get(target)! &&
+      limMap.get(node)! >= lowMap.get(source)! &&
+      limMap.get(node)! <= limMap.get(source)!
+    );
+  };
+  return minBy(
+    graph
+      .edges()
+      .filter(
+        ({ source, target }) =>
+          !isTailComponent(source, edge) && isTailComponent(target, edge)
+      ),
+    ({ source, target }: Edge) => getEdgeSlack(graph, source, target)
+  );
+};
 
 const exchange = (edge1: Edge, edge2: Edge) => {};
 
@@ -128,6 +149,6 @@ export const networkSimplex = (graph: Graph) => {
   const tightGraph = feasibleTree(graph);
   let edge: Edge | null = null;
   while ((edge = leaveEdge(graph, tightGraph))) {
-    exchange(edge, enterEdge(graph, tightGraph));
+    exchange(edge, enterEdge(graph, tightGraph, edge));
   }
 };

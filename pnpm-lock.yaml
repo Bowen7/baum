@@ -13,6 +13,7 @@ specifiers:
   '@nrwl/workspace': 14.5.1
   '@testing-library/react': 13.3.0
   '@types/jest': 27.4.1
+  '@types/lodash-es': ^4.17.6
   '@types/node': 16.11.7
   '@types/react': 18.0.15
   '@types/react-dom': 18.0.6
@@ -29,6 +30,7 @@ specifiers:
   eslint-plugin-react: 7.30.1
   eslint-plugin-react-hooks: 4.6.0
   jest: 27.5.1
+  lodash-es: ^4.17.21
   nx: 14.5.1
   perfect-arrows: ^0.3.7
   prettier: ^2.6.2
@@ -46,6 +48,7 @@ specifiers:
 dependencies:
   '@datastructures-js/priority-queue': 6.1.3
   core-js: 3.24.0
+  lodash-es: 4.17.21
   perfect-arrows: 0.3.7
   react: 18.2.0
   react-cool-dimensions: 2.0.7_react@18.2.0
@@ -66,6 +69,7 @@ devDependencies:
   '@nrwl/workspace': 14.5.1_p4mi2smrdlimk4bbxlu4b6wavm
   '@testing-library/react': 13.3.0_biqbaboplfbrettd7655fr4n2y
   '@types/jest': 27.4.1
+  '@types/lodash-es': 4.17.6
   '@types/node': 16.11.7
   '@types/react': 18.0.15
   '@types/react-dom': 18.0.6
@@ -2833,6 +2837,16 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/lodash-es/4.17.6:
+    resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
+    dependencies:
+      '@types/lodash': 4.14.187
+    dev: true
+
+  /@types/lodash/4.14.187:
+    resolution: {integrity: sha512-MrO/xLXCaUgZy3y96C/iOsaIqZSeupyTImKClHunL5GrmaiII2VwvWmLBu2hwa0Kp0sV19CsyjtrTc/Fx8rg/A==}
     dev: true
 
   /@types/mime/1.3.2:
@@ -7232,6 +7246,10 @@ packages:
     dependencies:
       p-locate: 5.0.0
     dev: true
+
+  /lodash-es/4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
 
   /lodash.camelcase/4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
