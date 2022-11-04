@@ -143,12 +143,15 @@ const enterEdge = (graph: Graph, tightGraph: Graph, edge: Edge): Edge => {
   );
 };
 
-const exchange = (edge1: Edge, edge2: Edge) => {};
+const exchange = (tightGraph: Graph, edge1: Edge, edge2: Edge) => {
+  tightGraph.removeEdge(edge1);
+  tightGraph.addEdge(edge2);
+};
 
 export const networkSimplex = (graph: Graph) => {
   const tightGraph = feasibleTree(graph);
   let edge: Edge | null = null;
   while ((edge = leaveEdge(graph, tightGraph))) {
-    exchange(edge, enterEdge(graph, tightGraph, edge));
+    exchange(tightGraph, edge, enterEdge(graph, tightGraph, edge));
   }
 };
