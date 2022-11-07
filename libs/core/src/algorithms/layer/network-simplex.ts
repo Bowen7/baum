@@ -3,6 +3,7 @@ import { Graph, postOrder } from '../../graph';
 import { Edge } from '../../types';
 import { longestPath } from './longest-path';
 import { bfs } from '../../graph/utils';
+import { defaults } from 'lodash-es';
 // https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=221135
 
 // in the simplest case,
@@ -148,10 +149,20 @@ const exchange = (tightGraph: Graph, edge1: Edge, edge2: Edge) => {
   tightGraph.addEdge(edge2);
 };
 
+const updateRanks = (graph: Graph, tightGraph: Graph) => {
+  bfs(tightGraph, (id: string) => {
+    const child = tightGraph.targets(id)[0];
+    if (child) {
+      graph.setRank(child, graph.getRank(id)!);
+    }
+  });
+};
+
 export const networkSimplex = (graph: Graph) => {
   const tightGraph = feasibleTree(graph);
   let edge: Edge | null = null;
   while ((edge = leaveEdge(graph, tightGraph))) {
     exchange(tightGraph, edge, enterEdge(graph, tightGraph, edge));
+    updateRanks(graph, tightGraph);
   }
 };
