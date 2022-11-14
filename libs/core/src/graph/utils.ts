@@ -1,4 +1,5 @@
 import { Graph } from './index';
+import { Edge } from '../types';
 
 export const postOrder = (graph: Graph, callback: (id: string) => void) => {
   const stack = graph.leaves;
@@ -17,34 +18,20 @@ export const postOrder = (graph: Graph, callback: (id: string) => void) => {
   }
 };
 
-const getRankNodeMap = (graph: Graph): [Map<number, string[]>, number] => {
-  const rankNodeMap = new Map<number, string[]>();
-  let maxRank = 0;
-  graph.nodes.forEach((node) => {
-    const rank = graph.getRank(node)!;
-    maxRank = Math.max(maxRank, rank);
-    let ids: string[] = [];
-    if (rankNodeMap.has(rank)) {
-      ids = rankNodeMap.get(rank)!;
-    } else {
-      rankNodeMap.set(rank, ids);
-    }
-    ids.push(node.id);
-  });
-  return [rankNodeMap, maxRank];
-};
-
-export const bfs = (graph: Graph, callback: (id: string) => void) => {
-  const [rankNodeMap, maxRank] = getRankNodeMap(graph);
-  for (let i = 0; i <= maxRank; i++) {
-    (rankNodeMap.get(i) || []).forEach((id) => callback(id));
+export const traverseEdgesByRoots = (graph: Graph, roots: string[]) => {
+  const visited = new Set<Edge>();
+  const result: Edge[] = [];
+  // TODO
+  const queue = [...roots];
+  while (queue.length > 0) {
+    const id = queue.shift()!;
+    const edges = graph.edges(id);
+    edges.forEach((edge) => {
+      if (!visited.has(edge)) {
+        visited.add(edge);
+        result.push(edge);
+      }
+    });
   }
-};
-
-// reserved bfs
-export const rbfs = (graph: Graph, callback: (id: string) => void) => {
-  const [rankNodeMap, maxRank] = getRankNodeMap(graph);
-  for (let i = maxRank; i > 0; i--) {
-    (rankNodeMap.get(i) || []).forEach((id) => callback(id));
-  }
+  return result;
 };
