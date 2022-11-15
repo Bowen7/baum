@@ -1,9 +1,8 @@
-import minBy from 'lodash/minBy';
-import { Graph, postOrder } from '../../graph';
+import minBy from 'lodash-es/minBy';
+import { Graph, traverseNodes } from '../../graph';
 import { Edge } from '../../types';
 import { longestPath } from './longest-path';
-import { bfs } from '../../graph/utils';
-import { defaults } from 'lodash-es';
+import { traverseEdgesByRoots } from '../../graph/utils';
 // https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=221135
 
 // in the simplest case,
@@ -79,7 +78,8 @@ const initLowsLims = (tightGraph: Graph) => {
   const lowMap = new Map<string, number>();
   const limMap = new Map<string, number>();
   let lim = 0;
-  postOrder(tightGraph, (id) => {
+  const nodes = traverseNodes(tightGraph).reverse();
+  nodes.forEach((id) => {
     limMap.set(id, lim++);
     const targets = tightGraph.targets(id);
     if (targets.length === 0) {
@@ -93,7 +93,8 @@ const initLowsLims = (tightGraph: Graph) => {
 
 const initCutValues = (graph: Graph, tightGraph: Graph) => {
   const cutValueMap = new Map<Edge, number>();
-  bfs(tightGraph, (id: string) => {
+  const nodes = traverseNodes(tightGraph);
+  nodes.forEach((id) => {
     const sourceEdges = graph.sourceEdges(id);
     const targetEdges = graph.targetEdges(id);
     const targetSize = targetEdges.length;
@@ -141,7 +142,7 @@ const enterEdge = (graph: Graph, tightGraph: Graph, edge: Edge): Edge => {
           !isTailComponent(source, edge) && isTailComponent(target, edge)
       ),
     ({ source, target }: Edge) => getEdgeSlack(graph, source, target)
-  );
+  ) as Edge;
 };
 
 const exchange = (tightGraph: Graph, edge1: Edge, edge2: Edge) => {
@@ -150,11 +151,27 @@ const exchange = (tightGraph: Graph, edge1: Edge, edge2: Edge) => {
 };
 
 const updateRanks = (graph: Graph, tightGraph: Graph) => {
-  bfs(tightGraph, (id: string) => {
-    const child = tightGraph.targets(id)[0];
-    if (child) {
-      graph.setRank(child, graph.getRank(id)!);
+  const roots = graph.roots;
+  const edges = traverseEdgesByRoots(tightGraph, roots);
+  const visited = new Set<string>(roots);
+  edges.forEach((edge) => {
+    const { source, target } = edge;
+    if (!visited.has(source)) {
+      graph.setRank(source, graph.getRank(target)! - MIN_LEN);
+      visited.add(source);
+    } else if (!visited.has(target)) {
+      graph.setRank(target, graph.getRank(source)! + MIN_LEN);
+      visited.add(target);
     }
+  });
+};
+
+const normalize = (graph: Graph) => {
+  const minRank = Math.min(
+    ...graph.nodes.map((node) => graph.getRank(node.id)!)
+  );
+  graph.nodes.forEach((node) => {
+    graph.setRank(node.id, graph.getRank(node.id)! - minRank);
   });
 };
 
@@ -165,4 +182,5 @@ export const networkSimplex = (graph: Graph) => {
     exchange(tightGraph, edge, enterEdge(graph, tightGraph, edge));
     updateRanks(graph, tightGraph);
   }
+  normalize(graph);
 };

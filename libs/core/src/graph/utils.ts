@@ -1,21 +1,22 @@
 import { Graph } from './index';
 import { Edge } from '../types';
 
-export const postOrder = (graph: Graph, callback: (id: string) => void) => {
-  const stack = graph.leaves;
-  const visited = new Set<string>();
-  while (stack.length) {
-    const id = stack[stack.length - 1];
-    const children = [...(graph.targetMap.get(id) ?? []).keys()] as string[];
-    if (children.length === 0 || visited.has(id)) {
-      stack.pop();
-      callback(id);
-      continue;
-    }
-
-    children.forEach((child) => stack.push(child));
-    visited.add(id);
+export const traverseNodes = (graph: Graph) => {
+  const roots = graph.roots;
+  const visited = new Set<string>(roots);
+  const result: string[] = [];
+  const queue = [...graph.roots];
+  while (queue.length) {
+    const id = queue.shift()!;
+    result.push(id);
+    graph.targets(id).forEach((target) => {
+      if (!visited.has(target)) {
+        queue.push(target);
+        visited.add(target);
+      }
+    });
   }
+  return result;
 };
 
 export const traverseEdgesByRoots = (graph: Graph, roots: string[]) => {
