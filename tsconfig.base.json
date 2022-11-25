@@ -15,9 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@hier/core": ["libs/core/src/index.ts"],
-      "@hier/perfect-arrows": ["libs/perfect-arrows/src/index.ts"],
-      "@hier/react": ["libs/react/src/index.ts"]
+      "@gt/core": ["libs/core/src/index.ts"],
+      "@gt/perfect-arrows": ["libs/perfect-arrows/src/index.ts"],
+      "@gt/react": ["libs/react/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NdTree, useLayout, Node, Edge } from '@hier/react';
+import { NdTree, useLayout, Node, Edge } from '@gt/react';
 import './demo.css';
 const nodes: Node[] = [
   { id: '1', label: '1111111' },
