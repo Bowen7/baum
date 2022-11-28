@@ -75,11 +75,14 @@ export class GeneralTree {
     return this.getChildren(parent)[index - 1];
   }
 
+  // TODO
+  apportion(node: TreeNode, level: number) {}
+
   firstWalk(node: TreeNode, level: number, parent: TreeNode, index: number) {
     this.setModifier(node);
 
+    const leftSibling = this.getLeftSibling(parent, index);
     if (this.isLeaf(node)) {
-      const leftSibling = this.getLeftSibling(parent, index);
       if (leftSibling) {
         const prelim =
           this.getPrelim(leftSibling)! +
@@ -94,6 +97,21 @@ export class GeneralTree {
       children.forEach((child, index) => {
         this.firstWalk(child, level + 1, child, index);
       });
+      const leftMost = children[0];
+      const rightMost = children[children.length - 1];
+      const midPoint =
+        (this.getPrelim(leftMost)! + this.getPrelim(rightMost)!) / 2;
+      if (leftSibling) {
+        const prelim =
+          this.getPrelim(leftSibling)! +
+          this.options.siblingSeparation +
+          (this.getNodeWidth(leftSibling) + this.getNodeWidth(node)) / 2;
+        this.setPrelim(node, prelim);
+        this.setModifier(node, prelim - midPoint);
+        this.apportion(node, level);
+      } else {
+        this.setPrelim(node, midPoint);
+      }
     }
   }
 
