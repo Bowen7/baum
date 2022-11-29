@@ -14,6 +14,12 @@ export class GeneralTree {
   protected nodeSizeMap = new Map<any, [number, number]>();
   protected modifierMap = new Map<any, number>();
   protected prelimMap = new Map<any, number>();
+  // the maximum number of levels in the tree to be positioned
+  protected maxDepth = 0;
+  // key: level, value: current right most
+  protected rightMostMap = new Map<number, TreeNode>();
+  protected leftNeighborMap = new Map<TreeNode, TreeNode>();
+  protected parentMap = new Map<TreeNode, TreeNode>();
   protected options = DEFAULT_OPTIONS;
   constructor(root: TreeNode, options: Options) {
     this.root = root;
@@ -68,20 +74,40 @@ export class GeneralTree {
     return this.getChildren(node).length === 0;
   }
 
-  getLeftSibling(parent: TreeNode, index: number) {
-    if (index < 1) {
-      return null;
+  getLeftNeighbor(node: TreeNode) {
+    return this.leftNeighborMap.get(node);
+  }
+
+  getParent(node: TreeNode) {
+    return this.parentMap.get(node);
+  }
+
+  setParent(node: TreeNode, parent: TreeNode) {
+    this.parentMap.set(node, parent);
+  }
+
+  getLeftSibling(node: TreeNode) {
+    const leftNeighbor = this.leftNeighborMap.get(node);
+    if (leftNeighbor) {
+      return this.getParent(leftNeighbor) === this.getParent(node)
+        ? leftNeighbor
+        : null;
     }
-    return this.getChildren(parent)[index - 1];
+    return null;
   }
 
   // TODO
-  apportion(node: TreeNode, level: number) {}
+  apportion(node: TreeNode, level: number) {
+    const leftMost = this.getChildren(node)[0];
+    const compareDepth = 1;
+    const depthToStop = this.maxDepth - level;
+  }
 
-  firstWalk(node: TreeNode, level: number, parent: TreeNode, index: number) {
+  firstWalk(node: TreeNode, level: number) {
     this.setModifier(node);
 
-    const leftSibling = this.getLeftSibling(parent, index);
+    this.rightMostMap.set(level, node);
+    const leftSibling = this.getLeftSibling(node);
     if (this.isLeaf(node)) {
       if (leftSibling) {
         const prelim =
@@ -94,8 +120,9 @@ export class GeneralTree {
       }
     } else {
       const children = this.getChildren(node);
-      children.forEach((child, index) => {
-        this.firstWalk(child, level + 1, child, index);
+      children.forEach((child) => {
+        this.setParent(child, node);
+        this.firstWalk(child, level + 1);
       });
       const leftMost = children[0];
       const rightMost = children[children.length - 1];
