@@ -17,9 +17,10 @@ export class GeneralTree {
   // the maximum number of levels in the tree to be positioned
   protected maxDepth = 0;
   // key: level, value: current right most
-  protected rightMostMap = new Map<number, TreeNode>();
-  protected leftNeighborMap = new Map<TreeNode, TreeNode>();
-  protected parentMap = new Map<TreeNode, TreeNode>();
+  protected rightMostMap = new Map<number, any>();
+  protected leftNeighborMap = new Map<any, any>();
+  protected parentMap = new Map<any, any>();
+  protected nodeMap = new Map<any, TreeNode>();
   protected options = DEFAULT_OPTIONS;
   constructor(root: TreeNode, options: Options) {
     this.root = root;
@@ -27,7 +28,8 @@ export class GeneralTree {
   }
 
   getId(node: TreeNode) {
-    return node.id || node;
+    const id = node.id || node;
+    this.nodeMap.set(id, node);
   }
 
   getChildren(node: TreeNode) {
@@ -48,6 +50,10 @@ export class GeneralTree {
 
   setNodeSize(node: TreeNode, size: [number, number]) {
     this.nodeSizeMap.set(this.getId(node), size);
+  }
+
+  getNodeById(id: any) {
+    return this.nodeMap.get(id);
   }
 
   getModifier(node: TreeNode) {
@@ -75,15 +81,23 @@ export class GeneralTree {
   }
 
   getLeftNeighbor(node: TreeNode) {
-    return this.leftNeighborMap.get(node);
+    const id = this.leftNeighborMap.get(this.getId(node));
+    if (id) {
+      return this.getNodeById(id);
+    }
+    return null;
   }
 
   getParent(node: TreeNode) {
-    return this.parentMap.get(node);
+    const id = this.parentMap.get(this.getId(node));
+    if (id) {
+      return this.getNodeById(id);
+    }
+    return null;
   }
 
   setParent(node: TreeNode, parent: TreeNode) {
-    this.parentMap.set(node, parent);
+    this.parentMap.set(this.getId(node), this.getId(parent));
   }
 
   getLeftSibling(node: TreeNode) {
