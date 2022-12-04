@@ -9,19 +9,21 @@ type Options = {
 const DEFAULT_OPTIONS: Options = {
   siblingSeparation: 5,
 };
+
 export class GeneralTree {
-  protected root: TreeNode;
-  protected nodeSizeMap = new Map<any, [number, number]>();
-  protected modifierMap = new Map<any, number>();
-  protected prelimMap = new Map<any, number>();
+  root: TreeNode;
+  nodeSizeMap = new Map<any, [number, number]>();
+  modifierMap = new Map<any, number>();
+  prelimMap = new Map<any, number>();
   // the maximum number of levels in the tree to be positioned
-  protected maxDepth = 0;
+  maxDepth = 0;
   // key: level, value: current right most
-  protected rightMostMap = new Map<number, any>();
-  protected leftNeighborMap = new Map<any, any>();
-  protected parentMap = new Map<any, any>();
-  protected nodeMap = new Map<any, TreeNode>();
-  protected options = DEFAULT_OPTIONS;
+  rightMostMap = new Map<number, any>();
+  leftNeighborMap = new Map<any, any>();
+  parentMap = new Map<any, any>();
+  nodeMap = new Map<any, TreeNode>();
+  neighborMap = new Map<any, { left: any; right: any }>();
+  options = DEFAULT_OPTIONS;
   constructor(root: TreeNode, options: Options) {
     this.root = root;
     this.options = { ...this.options, ...options };

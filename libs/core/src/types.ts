@@ -1,5 +1,8 @@
-export type Props<TreeNode> = {
-  tree: TreeNode;
-  getChildren: (node: TreeNode) => TreeNode[];
-  getGroup: (node: TreeNode) => TreeNode[];
+export type TreeId = number | string | symbol;
+
+export type TreeNode = {
+  id: TreeId;
+  children?: TreeNode[];
+  isSubTreeRoot?: boolean;
+  [key: string]: any;
 };
