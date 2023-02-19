@@ -2,10 +2,9 @@
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
   "projects": {
-    "core": "libs/core",
+    "baum": "libs/baum",
     "demo": "apps/demo",
     "demo-e2e": "apps/demo-e2e",
-    "perfect-arrows": "libs/perfect-arrows",
-    "react": "libs/react"
+    "react-baum": "libs/react-baum"
   }
 }

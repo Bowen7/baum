@@ -15,9 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@gt/core": ["libs/core/src/index.ts"],
-      "@gt/perfect-arrows": ["libs/perfect-arrows/src/index.ts"],
-      "@gt/react": ["libs/react/src/index.ts"]
+      "baum": ["libs/baum/src/index.ts"],
+      "react-baum": ["libs/react-baum/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

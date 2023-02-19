@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'core',
+  displayName: 'baum',
   preset: '../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -11,5 +11,5 @@ export default {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/core',
+  coverageDirectory: '../../coverage/libs/baum',
 };

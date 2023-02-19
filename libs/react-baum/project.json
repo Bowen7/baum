@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/react/src",
+  "sourceRoot": "libs/react-baum/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -8,16 +8,16 @@
       "executor": "@nrwl/web:rollup",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/react",
-        "tsConfig": "libs/react/tsconfig.lib.json",
-        "project": "libs/react/package.json",
-        "entryFile": "libs/react/src/index.ts",
+        "outputPath": "dist/libs/react-baum",
+        "tsConfig": "libs/react-baum/tsconfig.lib.json",
+        "project": "libs/react-baum/package.json",
+        "entryFile": "libs/reareact-baumct/src/index.ts",
         "external": ["react/jsx-runtime"],
         "rollupConfig": "@nrwl/react/plugins/bundle-rollup",
         "compiler": "babel",
         "assets": [
           {
-            "glob": "libs/react/README.md",
+            "glob": "libs/react-baum/README.md",
             "input": ".",
             "output": "."
           }
@@ -28,14 +28,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/react/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["libs/react-baum/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/react"],
+      "outputs": ["coverage/libs/react-baum"],
       "options": {
-        "jestConfig": "libs/react/jest.config.ts",
+        "jestConfig": "libs/react-baum/jest.config.ts",
         "passWithNoTests": true
       }
     }
