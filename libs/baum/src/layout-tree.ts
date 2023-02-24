@@ -1,36 +1,36 @@
-import { Options, NodeInfo, ID, NodePosition, Edge } from './types';
+import { Options, NodeInfo, NodeRect, Edge, NodeBase } from './types';
 
 const getAncestor = <Node>(
-  leftNode: NodeInfo<Node>,
-  rightNode: NodeInfo<Node>,
+  leftNodeInfo: NodeInfo<Node>,
+  rightNodeInfo: NodeInfo<Node>,
   defaultAncestor: NodeInfo<Node>
 ) =>
-  rightNode.parent === leftNode.ancestor?.parent
-    ? leftNode.ancestor
+  rightNodeInfo.parent === leftNodeInfo.ancestor?.parent
+    ? leftNodeInfo.ancestor
     : defaultAncestor;
 
 const moveSubTree = <Node>(
-  leftNode: NodeInfo<Node>,
-  rightNode: NodeInfo<Node>,
+  leftNodeInfo: NodeInfo<Node>,
+  rightNodeInfo: NodeInfo<Node>,
   shift: number
 ) => {
-  const subtrees = rightNode.index - leftNode.index;
-  rightNode.change -= shift / subtrees;
-  rightNode.shift += shift;
-  rightNode.prelim += shift;
-  rightNode.mod += shift;
-  leftNode.change += shift / subtrees;
+  const subtrees = rightNodeInfo.index - leftNodeInfo.index;
+  rightNodeInfo.change -= shift / subtrees;
+  rightNodeInfo.shift += shift;
+  rightNodeInfo.prelim += shift;
+  rightNodeInfo.mod += shift;
+  leftNodeInfo.change += shift / subtrees;
 };
 
-const getLeftmost = <Node>(node: NodeInfo<Node>) =>
-  node.children?.[0] ?? node.thread;
-const getRightmost = <Node>(node: NodeInfo<Node>) =>
-  node.children?.[node.children.length - 1] ?? node.thread;
+const getLeftmost = <Node>(nodeInfo: NodeInfo<Node>) =>
+  nodeInfo.children?.[0] ?? nodeInfo.thread;
+const getRightmost = <Node>(nodeInfo: NodeInfo<Node>) =>
+  nodeInfo.children?.[nodeInfo.children.length - 1] ?? nodeInfo.thread;
 
-const executeShifts = <Node>(node: NodeInfo<Node>) => {
+const executeShifts = <Node>(nodeInfo: NodeInfo<Node>) => {
   let shift = 0;
   let change = 0;
-  const { children = [] } = node;
+  const { children = [] } = nodeInfo;
   for (let i = children.length - 1; i >= 0; i--) {
     const child = children[i];
     child.prelim += shift;
@@ -40,25 +40,15 @@ const executeShifts = <Node>(node: NodeInfo<Node>) => {
   }
 };
 
-export class LayoutTree<
-  Node extends {
-    children?: Node[];
-    group?: Node[] | Node[][];
-    width?: number;
-    height?: number;
-  }
-> {
-  root: Node | Node[];
+export class LayoutTree<Node extends NodeBase<Node>> {
+  nodeInfoRoot: NodeInfo<Node>;
   options: Options<Node>;
-  nodeInfoTree!: NodeInfo<Node>;
-  nodeInfoMap = new Map<ID<Node>, NodeInfo<Node>>();
   heights: number[] = [];
-  nodes: NodePosition<Node>[] = [];
+  nodes: NodeRect<Node>[] = [];
   edges: Edge<Node>[] = [];
-  constructor(root: Node | Node[], options: Options<Node>) {
-    this.root = root;
+  constructor(root: NodeInfo<Node>, options: Options<Node>) {
+    this.nodeInfoRoot = root;
     this.options = options;
-    this.nodeInfoTree = this.initNodeInfo(this.root, null);
   }
 
   get levelSpacing() {
@@ -69,89 +59,6 @@ export class LayoutTree<
   get siblingSpacing() {
     const spacing = this.options.spacing;
     return Array.isArray(spacing) ? spacing[1] : spacing;
-  }
-
-  setNodeSize(
-    id: ID<Node> | { id: ID<Node>; size: [number, number] }[],
-    size?: [number, number]
-  ) {
-    if (Array.isArray(id)) {
-      const nodeSizes = id;
-      nodeSizes.forEach(({ id, size: [width, height] }) => {
-        const nodeInfo = this.nodeInfoMap.get(id);
-        if (nodeInfo) {
-          nodeInfo.width = width;
-          nodeInfo.height = height;
-        }
-      });
-    } else if (size) {
-      const nodeInfo = this.nodeInfoMap.get(id);
-      if (nodeInfo) {
-        nodeInfo.width = size[0];
-        nodeInfo.height = size[1];
-      }
-    }
-  }
-
-  createNodeInfo = (
-    node: Node | null,
-    parentInfo: NodeInfo<Node> | null,
-    virtual = false
-  ): NodeInfo<Node> => {
-    const width = node?.width ?? 0;
-    const height = node?.height ?? 0;
-    const level = (parentInfo?.level ?? -1) + 1;
-
-    const nodeInfo: NodeInfo<Node> = {
-      virtual: virtual,
-      node,
-      x: 0,
-      y: 0,
-      width,
-      height,
-      level,
-      prelim: 0,
-      mod: 0,
-      change: 0,
-      shift: 0,
-      index: 0,
-      children: [],
-      previousSibling: null,
-      parent: parentInfo,
-      thread: null,
-      ancestor: null,
-    };
-
-    this.heights[level] = Math.max(this.heights[level] ?? 0, height);
-
-    if (node) {
-      const { getID } = this.options;
-      const id = getID(node);
-      this.nodeInfoMap.set(id, nodeInfo);
-    }
-    return nodeInfo;
-  };
-
-  initNodeInfo(node: Node | Node[], parent: NodeInfo<Node> | null) {
-    let nodeInfo!: NodeInfo<Node>;
-    let children: Node[] | undefined;
-    if (Array.isArray(node)) {
-      nodeInfo = this.createNodeInfo(null, parent, true);
-      children = node;
-    } else {
-      nodeInfo = this.createNodeInfo(node, parent);
-      children = node.children;
-    }
-    let previousSiblingInfo: NodeInfo<Node> | null = null;
-    children?.forEach((childNode, index) => {
-      const childNodeInfo = this.initNodeInfo(childNode, nodeInfo);
-      childNodeInfo.previousSibling = previousSiblingInfo;
-      childNodeInfo.index = index;
-      nodeInfo.children.push(childNodeInfo);
-
-      previousSiblingInfo = childNodeInfo;
-    });
-    return nodeInfo;
   }
 
   apportion(
@@ -220,7 +127,10 @@ export class LayoutTree<
   }
 
   firstWalk(nodeInfo: NodeInfo<Node>) {
-    const { previousSibling, children = [] } = nodeInfo;
+    const { previousSibling, children = [], node, height, level } = nodeInfo;
+    if (node) {
+      this.heights[level] = Math.max(this.heights[level] ?? 0, height);
+    }
     if (children.length > 0) {
       let defaultAncestor = children[0];
       children.forEach((childNodeInfo) => {
@@ -252,7 +162,7 @@ export class LayoutTree<
   secondWalk(nodeInfo: NodeInfo<Node>, mod: number, y: number) {
     nodeInfo.x = nodeInfo.prelim + mod;
     nodeInfo.y = y;
-    let start: NodePosition<Node> | null = null;
+    let start: NodeRect<Node> | null = null;
     if (nodeInfo.node) {
       start = {
         x: nodeInfo.x,
@@ -274,8 +184,8 @@ export class LayoutTree<
 
   layout() {
     this.nodes = [];
-    this.firstWalk(this.nodeInfoTree);
-    this.secondWalk(this.nodeInfoTree, 0, 0);
+    this.firstWalk(this.nodeInfoRoot);
+    this.secondWalk(this.nodeInfoRoot, 0, 0);
     return { nodes: this.nodes, edges: this.edges };
   }
 }

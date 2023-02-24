@@ -2,15 +2,20 @@ export type Orientation = 'top' | 'bottom' | 'left' | 'right' | 'radial';
 
 export type LevelAlign = 'start' | 'center' | 'none';
 
-export type ID<Node> = string | number | symbol | Node;
+export type ID = string | number | symbol;
+export interface NodeBase<Node> {
+  id?: string;
+  children?: Node[];
+  group?: Node[] | Node[][];
+  width?: number;
+  height?: number;
+}
 
-export type Options<
-  Node extends { children?: Node[]; group?: Node[] | Node[][] }
-> = {
+export type Options<Node extends NodeBase<Node>> = {
   orientation: Orientation;
   levelAlign: LevelAlign;
   spacing: number | [number, number];
-  getID: (node: Node) => ID<Node>;
+  getID: (node: Node) => ID;
   getChildren: (node: Node) => Node['children'];
   getGroup: (node: Node) => Node['group'];
 };
@@ -35,7 +40,7 @@ export type NodeInfo<Node> = {
   ancestor: NodeInfo<Node> | null;
 };
 
-export type NodePosition<Node> = {
+export type NodeRect<Node> = {
   x: number;
   y: number;
   width: number;
@@ -43,6 +48,6 @@ export type NodePosition<Node> = {
   node: Node;
 };
 export type Edge<Node> = {
-  start: NodePosition<Node>;
-  end: NodePosition<Node>;
+  start: NodeRect<Node>;
+  end: NodeRect<Node>;
 };

@@ -1,4 +1,4 @@
-import { LayoutTree, Options } from 'baum';
+import { baum, Options } from 'baum';
 import { Fragment, useState } from 'react';
 type Tree = {
   title: string;
@@ -15,7 +15,7 @@ const root: Tree = {
     {
       title: 'e',
       children: [
-        { title: 'a', width: 30, height: 40 },
+        { title: 'a', width: 30, height: 80 },
         {
           title: 'd',
           children: [
@@ -65,19 +65,15 @@ const root: Tree = {
     },
   ],
 };
-const options: Options<Tree> = {
+const options: Partial<Options<Tree>> = {
   orientation: 'bottom',
   levelAlign: 'start',
   spacing: [40, 25],
-  getID: (node: Tree) => node,
-  getChildren: (node: Tree) => node.children,
-  getGroup: (node: Tree) => [],
+  getID: (node: Tree) => node.title,
 };
+
 export const Demo = () => {
-  const [{ nodes, edges }] = useState(() => {
-    const tree = new LayoutTree(root, options);
-    return tree.layout();
-  });
+  const [{ nodes, edges }] = useState(() => baum(root, options));
   return (
     <div className="m-6">
       <svg width={500} height={500}>
@@ -104,7 +100,7 @@ export const Demo = () => {
                 height={height}
                 fill="transparent"
                 stroke="black"
-              ></rect>
+              />
               <text
                 textAnchor="middle"
                 fontSize={16}
@@ -124,7 +120,7 @@ export const Demo = () => {
             },${end.y}`}
             key={`${start.node.title}-${end.node.title}`}
             stroke="#000"
-            strokeWidth={2}
+            strokeWidth={1}
             fill="none"
           />
         ))}
