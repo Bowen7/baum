@@ -1,3 +1,134 @@
+import { LayoutTree, Options } from 'baum';
+import { Fragment, useState } from 'react';
+type Tree = {
+  title: string;
+  children?: Tree[];
+  width: number;
+  height: number;
+};
+
+const root: Tree = {
+  title: 'r',
+  width: 30,
+  height: 40,
+  children: [
+    {
+      title: 'e',
+      children: [
+        { title: 'a', width: 30, height: 40 },
+        {
+          title: 'd',
+          children: [
+            { title: 'b', width: 30, height: 40 },
+            { title: 'c', width: 30, height: 40 },
+          ],
+          width: 30,
+          height: 40,
+        },
+      ],
+      width: 30,
+      height: 40,
+    },
+    { title: 'f', width: 30, height: 40 },
+    {
+      title: 'n',
+      children: [
+        { title: 'g', width: 30, height: 40 },
+        {
+          title: 'm',
+          children: [
+            { title: 'h', width: 30, height: 40 },
+            { title: 'i', width: 30, height: 40 },
+            { title: 'j', width: 30, height: 40 },
+            { title: 'k', width: 30, height: 40 },
+            { title: 'l', width: 30, height: 40 },
+          ],
+          width: 60,
+          height: 40,
+        },
+      ],
+      width: 30,
+      height: 60,
+    },
+    {
+      title: 'q',
+      children: [
+        {
+          title: 'p',
+          children: [{ title: 'o', width: 30, height: 40 }],
+          width: 30,
+          height: 40,
+        },
+      ],
+      width: 30,
+      height: 40,
+    },
+  ],
+};
+const options: Options<Tree> = {
+  orientation: 'bottom',
+  levelAlign: 'start',
+  spacing: [40, 25],
+  getID: (node: Tree) => node,
+  getChildren: (node: Tree) => node.children,
+  getGroup: (node: Tree) => [],
+};
 export const Demo = () => {
-  return <div className="m-6">Demo</div>;
+  const [{ nodes, edges }] = useState(() => {
+    const tree = new LayoutTree(root, options);
+    return tree.layout();
+  });
+  return (
+    <div className="m-6">
+      <svg width={500} height={500}>
+        {nodes.map(
+          ({
+            node,
+            x,
+            y,
+            width,
+            height,
+          }: {
+            node: Tree;
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+          }) => (
+            <Fragment>
+              <rect
+                key={node.title}
+                x={x}
+                y={y}
+                width={width}
+                height={height}
+                fill="transparent"
+                stroke="black"
+              ></rect>
+              <text
+                textAnchor="middle"
+                fontSize={16}
+                x={x + width / 2}
+                y={y + height / 2}
+                dy={8}
+              >
+                {node.title}
+              </text>
+            </Fragment>
+          )
+        )}
+        {edges.map(({ start, end }) => (
+          <path
+            d={`M${start.x + start.width / 2},${start.y + start.height}L${
+              end.x + end.width / 2
+            },${end.y}`}
+            key={`${start.node.title}-${end.node.title}`}
+            stroke="#000"
+            strokeWidth={2}
+            fill="none"
+          />
+        ))}
+      </svg>
+    </div>
+  );
 };
