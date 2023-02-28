@@ -15,12 +15,12 @@ const getDefaultOptions = <Node extends NodeBase<Node>>(): Options<Node> => ({
 });
 
 export class Baum<Node extends NodeBase<Node>> {
-  nodeInfoRoot!: NodeInfo<Node>;
+  rootInfo!: NodeInfo<Node>;
   nodeInfoMap = new Map<ID, NodeInfo<Node>>();
   options = getDefaultOptions<Node>();
   constructor(root: Node | Node[], options: Partial<Options<Node>> = {}) {
     this.options = { ...this.options, ...options };
-    this.nodeInfoRoot = this.initNodeInfo(root, null);
+    this.rootInfo = this.initNodeInfo(root, null);
   }
 
   createNodeInfo = (
@@ -105,7 +105,7 @@ export class Baum<Node extends NodeBase<Node>> {
   }
 
   layout() {
-    const layoutTree = new LayoutTree(this.nodeInfoRoot, this.options);
+    const layoutTree = new LayoutTree(this.rootInfo, this.options);
     return layoutTree.layout();
   }
 }

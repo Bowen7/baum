@@ -47,7 +47,14 @@ export type NodeRect<Node> = {
   height: number;
   node: Node;
 };
+
+export type Position = { x: number; y: number };
+
 export type Edge<Node> = {
-  start: NodeRect<Node>;
-  end: NodeRect<Node>;
+  start: Position;
+  end: Position;
+  startRect: NodeRect<Node>;
+  endRect: NodeRect<Node>;
+  startNode: Node;
+  endNode: Node;
 };

@@ -1,5 +1,6 @@
-import { Options, NodeInfo, NodeRect, Edge, NodeBase } from './types';
-
+// On the basis of Buchheim C, Jünger M, Leipert S. Improving Walker’s algorithm to run in linear time[C]
+// Graph Drawing: 10th International Symposium, GD 2002 Irvine, CA, USA, August 26–28, 2002 Revised Papers 10. Springer Berlin Heidelberg, 2002: 344-353.
+import { Options, NodeInfo, NodeRect, Edge, NodeBase, Position } from './types';
 const getAncestor = <Node>(
   leftNodeInfo: NodeInfo<Node>,
   rightNodeInfo: NodeInfo<Node>,
@@ -40,14 +41,19 @@ const executeShifts = <Node>(nodeInfo: NodeInfo<Node>) => {
   }
 };
 
+// Some definitions:
+// - size: if the orientation is left/right, it's the width, otherwise it's the height
+// - span: if the orientation is left/right, it's the height, otherwise it's the width
 export class LayoutTree<Node extends NodeBase<Node>> {
-  nodeInfoRoot: NodeInfo<Node>;
+  rootInfo: NodeInfo<Node>;
   options: Options<Node>;
-  heights: number[] = [];
+  width = 0;
+  height = 0;
+  levelsSpan: number[] = [];
   nodes: NodeRect<Node>[] = [];
   edges: Edge<Node>[] = [];
   constructor(root: NodeInfo<Node>, options: Options<Node>) {
-    this.nodeInfoRoot = root;
+    this.rootInfo = root;
     this.options = options;
   }
 
@@ -59,6 +65,43 @@ export class LayoutTree<Node extends NodeBase<Node>> {
   get siblingSpacing() {
     const spacing = this.options.spacing;
     return Array.isArray(spacing) ? spacing[1] : spacing;
+  }
+
+  get isSizeEqualWidth() {
+    const { orientation } = this.options;
+    if (orientation === 'top' || orientation === 'bottom') {
+      return true;
+    }
+    return false;
+  }
+
+  get secondWalkStart() {
+    switch (this.options.orientation) {
+      case 'top':
+        return this.height - this.rootInfo.height;
+      case 'left':
+        return this.width - this.rootInfo.width;
+      default:
+        return 0;
+    }
+  }
+
+  getSize(nodeInfo: NodeInfo<Node>) {
+    if (this.isSizeEqualWidth) {
+      return nodeInfo.width;
+    }
+    return nodeInfo.height;
+  }
+
+  getSpan(nodeInfo: NodeInfo<Node>) {
+    if (this.isSizeEqualWidth) {
+      return nodeInfo.height;
+    }
+    return nodeInfo.width;
+  }
+
+  getMeanNodeSize(nodeInfo1: NodeInfo<Node>, nodeInfo2: NodeInfo<Node>) {
+    return (this.getSize(nodeInfo1) + this.getSize(nodeInfo2)) / 2;
   }
 
   apportion(
@@ -92,7 +135,8 @@ export class LayoutTree<Node extends NodeBase<Node>> {
           leftTreeRightmostModSum -
           (rightTreeLeftmost.prelim + rightTreeLeftmostModSum) +
           this.siblingSpacing +
-          (leftTreeRightmost.width + rightTreeLeftmost.width) / 2;
+          this.getSize(leftTreeRightmost);
+
         if (shift > 0) {
           moveSubTree(
             getAncestor(leftTreeRightmost, node, defaultAncestor),
@@ -127,9 +171,12 @@ export class LayoutTree<Node extends NodeBase<Node>> {
   }
 
   firstWalk(nodeInfo: NodeInfo<Node>) {
-    const { previousSibling, children = [], node, height, level } = nodeInfo;
+    const { previousSibling, children = [], node, level } = nodeInfo;
     if (node) {
-      this.heights[level] = Math.max(this.heights[level] ?? 0, height);
+      this.levelsSpan[level] = Math.max(
+        this.levelsSpan[level] ?? 0,
+        this.getSpan(nodeInfo)
+      );
     }
     if (children.length > 0) {
       let defaultAncestor = children[0];
@@ -146,7 +193,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
         nodeInfo.prelim =
           previousSibling.prelim +
           this.siblingSpacing +
-          (previousSibling.width + nodeInfo.width) / 2;
+          this.getSize(previousSibling);
         nodeInfo.mod = nodeInfo.prelim - midpoint;
       } else {
         nodeInfo.prelim = midpoint;
@@ -155,13 +202,114 @@ export class LayoutTree<Node extends NodeBase<Node>> {
       nodeInfo.prelim =
         previousSibling.prelim +
         this.siblingSpacing +
-        (previousSibling.width + nodeInfo.width) / 2;
+        this.getSize(previousSibling);
     }
   }
 
-  secondWalk(nodeInfo: NodeInfo<Node>, mod: number, y: number) {
-    nodeInfo.x = nodeInfo.prelim + mod;
-    nodeInfo.y = y;
+  calculateNodePosition(
+    nodeInfo: NodeInfo<Node>,
+    mod: number,
+    levelStart: number
+  ): number {
+    const { orientation } = this.options;
+    switch (orientation) {
+      case 'top':
+        nodeInfo.x = nodeInfo.prelim + mod;
+        nodeInfo.y = levelStart;
+        return levelStart - this.levelsSpan[nodeInfo.level] - this.levelSpacing;
+      case 'left':
+        nodeInfo.y = nodeInfo.prelim + mod;
+        nodeInfo.x = levelStart;
+        return levelStart - this.levelsSpan[nodeInfo.level] - this.levelSpacing;
+        break;
+      case 'right':
+        nodeInfo.y = nodeInfo.prelim + mod;
+        nodeInfo.x = levelStart;
+        return levelStart + this.levelsSpan[nodeInfo.level] + this.levelSpacing;
+        break;
+      default:
+        nodeInfo.x = nodeInfo.prelim + mod;
+        nodeInfo.y = levelStart;
+        return levelStart + this.levelsSpan[nodeInfo.level] + this.levelSpacing;
+    }
+  }
+
+  calculateEdge(
+    startRect: NodeRect<Node>,
+    endRect: NodeRect<Node>
+  ): Edge<Node> {
+    const {
+      node: startNode,
+      x: startX,
+      y: startY,
+      width: startWidth,
+      height: startHeight,
+    } = startRect;
+    const {
+      node: endNode,
+      x: endX,
+      y: endY,
+      width: endWidth,
+      height: endHeight,
+    } = endRect;
+    let start!: Position;
+    let end!: Position;
+    switch (this.options.orientation) {
+      case 'top':
+        start = {
+          x: startX + startWidth / 2,
+          y: startY,
+        };
+        end = {
+          x: endX + endWidth / 2,
+          y: endY + endHeight,
+        };
+        break;
+      case 'left':
+        start = {
+          x: startX,
+          y: startY + startHeight / 2,
+        };
+        end = {
+          x: endX + endWidth,
+          y: endY + endHeight / 2,
+        };
+        break;
+      case 'right':
+        start = {
+          x: startX + startWidth,
+          y: startY + startHeight / 2,
+        };
+        end = {
+          x: endX,
+          y: endY + endHeight / 2,
+        };
+        break;
+      default:
+        start = {
+          x: startX + startWidth / 2,
+          y: startY + startHeight,
+        };
+        end = {
+          x: endX + endWidth / 2,
+          y: endY,
+        };
+        break;
+    }
+    return { start, end, startNode, endNode, startRect, endRect };
+  }
+
+  secondWalk(nodeInfo: NodeInfo<Node>, mod: number, levelStart: number) {
+    levelStart = this.calculateNodePosition(nodeInfo, mod, levelStart);
+
+    if (this.isSizeEqualWidth) {
+      this.width = Math.max(this.width, nodeInfo.x + nodeInfo.width);
+    } else {
+      this.height = Math.max(this.height, nodeInfo.y + nodeInfo.height);
+    }
+
+    mod += nodeInfo.mod;
+
     let start: NodeRect<Node> | null = null;
     if (nodeInfo.node) {
       start = {
@@ -173,19 +321,37 @@ export class LayoutTree<Node extends NodeBase<Node>> {
       };
       this.nodes.push(start);
     }
-    mod += nodeInfo.mod;
-    y += this.heights[nodeInfo.level] + this.levelSpacing;
     nodeInfo.children?.forEach((childNodeInfo) => {
-      const end = this.secondWalk(childNodeInfo, mod, y)!;
-      start && this.edges.push({ start, end });
+      const end = this.secondWalk(childNodeInfo, mod, levelStart)!;
+      if (start) {
+        this.edges.push(this.calculateEdge(start, end));
+      }
     });
     return start;
   }
 
+  calculateTreeSpan() {
+    let treeSpan = (this.levelsSpan.length - 1) * this.levelSpacing;
+    this.levelsSpan.forEach((levelSpan) => (treeSpan += levelSpan));
+    if (this.isSizeEqualWidth) {
+      this.height = treeSpan;
+    } else {
+      this.width = treeSpan;
+    }
+  }
+
   layout() {
+    this.width = 0;
+    this.height = 0;
     this.nodes = [];
-    this.firstWalk(this.nodeInfoRoot);
-    this.secondWalk(this.nodeInfoRoot, 0, 0);
-    return { nodes: this.nodes, edges: this.edges };
+    this.firstWalk(this.rootInfo);
+    this.calculateTreeSpan();
+    this.secondWalk(this.rootInfo, 0, this.secondWalkStart);
+    return {
+      width: this.width,
+      height: this.height,
+      nodes: this.nodes,
+      edges: this.edges,
+    };
   }
 }

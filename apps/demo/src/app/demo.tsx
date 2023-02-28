@@ -66,17 +66,17 @@ const root: Tree = {
   ],
 };
 const options: Partial<Options<Tree>> = {
-  orientation: 'bottom',
+  orientation: 'left',
   levelAlign: 'start',
   spacing: [40, 25],
   getID: (node: Tree) => node.title,
 };
 
 export const Demo = () => {
-  const [{ nodes, edges }] = useState(() => baum(root, options));
+  const [{ nodes, edges, width, height }] = useState(() => baum(root, options));
   return (
     <div className="m-6">
-      <svg width={500} height={500}>
+      <svg width={width} height={height}>
         {nodes.map(
           ({
             node,
@@ -113,12 +113,10 @@ export const Demo = () => {
             </Fragment>
           )
         )}
-        {edges.map(({ start, end }) => (
+        {edges.map(({ start, end, startNode, endNode }) => (
           <path
-            d={`M${start.x + start.width / 2},${start.y + start.height}L${
-              end.x + end.width / 2
-            },${end.y}`}
-            key={`${start.node.title}-${end.node.title}`}
+            d={`M${start.x},${start.y}L${end.x},${end.y}`}
+            key={`${startNode.title}-${endNode.title}`}
             stroke="#000"
             strokeWidth={1}
             fill="none"
