@@ -66,9 +66,10 @@ const root: Tree = {
   ],
 };
 const options: Partial<Options<Tree>> = {
-  orientation: 'left',
+  orientation: 'bottom',
   levelAlign: 'start',
   spacing: [40, 25],
+  compact: false,
   getID: (node: Tree) => node.title,
 };
 

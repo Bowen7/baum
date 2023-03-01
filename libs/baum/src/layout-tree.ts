@@ -15,12 +15,12 @@ const moveSubTree = <Node>(
   rightNodeInfo: NodeInfo<Node>,
   shift: number
 ) => {
-  const subtrees = rightNodeInfo.index - leftNodeInfo.index;
-  rightNodeInfo.change -= shift / subtrees;
+  const subtreesCount = rightNodeInfo.index - leftNodeInfo.index;
+  rightNodeInfo.change -= shift / subtreesCount;
   rightNodeInfo.shift += shift;
   rightNodeInfo.prelim += shift;
   rightNodeInfo.mod += shift;
-  leftNodeInfo.change += shift / subtrees;
+  leftNodeInfo.change += shift / subtreesCount;
 };
 
 const getLeftmost = <Node>(nodeInfo: NodeInfo<Node>) =>
@@ -50,6 +50,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
   width = 0;
   height = 0;
   levelsSpan: number[] = [];
+  leafStart = 0;
   nodes: NodeRect<Node>[] = [];
   edges: Edge<Node>[] = [];
   constructor(root: NodeInfo<Node>, options: Options<Node>) {
@@ -78,9 +79,9 @@ export class LayoutTree<Node extends NodeBase<Node>> {
   get secondWalkStart() {
     switch (this.options.orientation) {
       case 'top':
-        return this.height - this.rootInfo.height;
+        return this.height;
       case 'left':
-        return this.width - this.rootInfo.width;
+        return this.width;
       default:
         return 0;
     }
@@ -100,7 +101,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     return nodeInfo.width;
   }
 
-  getMeanNodeSize(nodeInfo1: NodeInfo<Node>, nodeInfo2: NodeInfo<Node>) {
+  getMeanSize(nodeInfo1: NodeInfo<Node>, nodeInfo2: NodeInfo<Node>) {
     return (this.getSize(nodeInfo1) + this.getSize(nodeInfo2)) / 2;
   }
 
@@ -108,11 +109,11 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     node: NodeInfo<Node>,
     defaultAncestor: NodeInfo<Node>
   ): NodeInfo<Node> {
-    const sibling = node.previousSibling;
-    if (sibling) {
+    const leftSibling = node.previousSibling;
+    if (leftSibling) {
       let rightTreeLeftmost = node;
       let rightTreeRightmost = node;
-      let leftTreeRightmost = sibling;
+      let leftTreeRightmost = leftSibling;
       let parentFirstChildLeftmost = node.parent!.children[0];
 
       let rightTreeLeftmostModSum = rightTreeLeftmost.mod;
@@ -135,7 +136,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
           leftTreeRightmostModSum -
           (rightTreeLeftmost.prelim + rightTreeLeftmostModSum) +
           this.siblingSpacing +
-          this.getSize(leftTreeRightmost);
+          this.getMeanSize(leftTreeRightmost, rightTreeLeftmost);
 
         if (shift > 0) {
           moveSubTree(
@@ -170,18 +171,45 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     return defaultAncestor;
   }
 
-  firstWalk(nodeInfo: NodeInfo<Node>) {
-    const { previousSibling, children = [], node, level } = nodeInfo;
+  setLevelsSpan(nodeInfo: NodeInfo<Node>) {
+    const { node, level } = nodeInfo;
     if (node) {
       this.levelsSpan[level] = Math.max(
         this.levelsSpan[level] ?? 0,
         this.getSpan(nodeInfo)
       );
     }
+  }
+
+  roomyWalk(nodeInfo: NodeInfo<Node>) {
+    this.setLevelsSpan(nodeInfo);
+
+    const { children = [] } = nodeInfo;
+    if (children.length > 0) {
+      children.forEach((childNodeInfo) => {
+        this.roomyWalk(childNodeInfo);
+      });
+      const leftmost = children[0];
+      const rightmost = children[children.length - 1];
+      const midpoint = (leftmost.prelim + rightmost.prelim) / 2;
+
+      nodeInfo.prelim = midpoint;
+    } else {
+      this.leafStart += this.getSize(nodeInfo) / 2;
+      nodeInfo.prelim = this.leafStart;
+      this.leafStart += this.getSize(nodeInfo) / 2 + this.siblingSpacing;
+    }
+  }
+
+  compactWalk(nodeInfo: NodeInfo<Node>) {
+    this.setLevelsSpan(nodeInfo);
+
+    const { previousSibling, children = [] } = nodeInfo;
+
     if (children.length > 0) {
       let defaultAncestor = children[0];
       children.forEach((childNodeInfo) => {
-        this.firstWalk(childNodeInfo);
+        this.compactWalk(childNodeInfo);
         defaultAncestor = this.apportion(childNodeInfo, defaultAncestor);
       });
       executeShifts(nodeInfo);
@@ -193,7 +221,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
         nodeInfo.prelim =
           previousSibling.prelim +
           this.siblingSpacing +
-          this.getSize(previousSibling);
+          this.getMeanSize(previousSibling, nodeInfo);
         nodeInfo.mod = nodeInfo.prelim - midpoint;
       } else {
         nodeInfo.prelim = midpoint;
@@ -202,7 +230,9 @@ export class LayoutTree<Node extends NodeBase<Node>> {
       nodeInfo.prelim =
         previousSibling.prelim +
         this.siblingSpacing +
-        this.getSize(previousSibling);
+        this.getMeanSize(previousSibling, nodeInfo);
+    } else {
+      nodeInfo.prelim = this.getSize(nodeInfo) / 2;
     }
   }
 
@@ -211,24 +241,23 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     mod: number,
     levelStart: number
   ): number {
+    const { width, height } = nodeInfo;
     const { orientation } = this.options;
     switch (orientation) {
       case 'top':
-        nodeInfo.x = nodeInfo.prelim + mod;
-        nodeInfo.y = levelStart;
+        nodeInfo.x = nodeInfo.prelim + mod - width / 2;
+        nodeInfo.y = levelStart - nodeInfo.height;
         return levelStart - this.levelsSpan[nodeInfo.level] - this.levelSpacing;
       case 'left':
-        nodeInfo.y = nodeInfo.prelim + mod;
-        nodeInfo.x = levelStart;
+        nodeInfo.y = nodeInfo.prelim + mod - height / 2;
+        nodeInfo.x = levelStart - nodeInfo.width;
         return levelStart - this.levelsSpan[nodeInfo.level] - this.levelSpacing;
-        break;
       case 'right':
-        nodeInfo.y = nodeInfo.prelim + mod;
+        nodeInfo.y = nodeInfo.prelim + mod - height / 2;
         nodeInfo.x = levelStart;
         return levelStart + this.levelsSpan[nodeInfo.level] + this.levelSpacing;
-        break;
       default:
-        nodeInfo.x = nodeInfo.prelim + mod;
+        nodeInfo.x = nodeInfo.prelim + mod - width / 2;
         nodeInfo.y = levelStart;
         return levelStart + this.levelsSpan[nodeInfo.level] + this.levelSpacing;
     }
@@ -344,7 +373,11 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     this.width = 0;
     this.height = 0;
     this.nodes = [];
-    this.firstWalk(this.rootInfo);
+    if (this.options.compact) {
+      this.compactWalk(this.rootInfo);
+    } else {
+      this.roomyWalk(this.rootInfo);
+    }
     this.calculateTreeSpan();
     this.secondWalk(this.rootInfo, 0, this.secondWalkStart);
     return {

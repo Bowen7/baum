@@ -8,6 +8,7 @@ const DEFAULT_SIBLING_SPACING = 15;
 const getDefaultOptions = <Node extends NodeBase<Node>>(): Options<Node> => ({
   orientation: 'bottom',
   levelAlign: 'start',
+  compact: true,
   spacing: [DEFAULT_LEVEL_SPACING, DEFAULT_SIBLING_SPACING],
   getID: (node: Node) => node.id!,
   getChildren: (node: Node) => node.children,
@@ -21,6 +22,14 @@ export class Baum<Node extends NodeBase<Node>> {
   constructor(root: Node | Node[], options: Partial<Options<Node>> = {}) {
     this.options = { ...this.options, ...options };
     this.rootInfo = this.initNodeInfo(root, null);
+  }
+
+  checkOptions() {
+    const { options } = this;
+    // if levelAlign is none, compact must be false
+    if (options.levelAlign === 'none') {
+      options.compact = false;
+    }
   }
 
   createNodeInfo = (

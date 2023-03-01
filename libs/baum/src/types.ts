@@ -14,6 +14,7 @@ export interface NodeBase<Node> {
 export type Options<Node extends NodeBase<Node>> = {
   orientation: Orientation;
   levelAlign: LevelAlign;
+  compact: boolean;
   spacing: number | [number, number];
   getID: (node: Node) => ID;
   getChildren: (node: Node) => Node['children'];
