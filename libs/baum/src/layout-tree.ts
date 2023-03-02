@@ -241,26 +241,42 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     mod: number,
     levelStart: number
   ): number {
-    const { width, height } = nodeInfo;
-    const { orientation } = this.options;
+    const { width, height, level } = nodeInfo;
+    const { orientation, levelAlign } = this.options;
+
+    let levelOffset!: number;
+    if (levelAlign === 'none') {
+      levelOffset = height + this.levelSpacing;
+    } else {
+      levelOffset = this.levelsSpan[level] + this.levelSpacing;
+    }
+
+    let nodeOffset = 0;
+    if (levelAlign === 'center') {
+      nodeOffset = this.levelsSpan[level] / 2 - this.getSpan(nodeInfo) / 2;
+    }
+
     switch (orientation) {
       case 'top':
         nodeInfo.x = nodeInfo.prelim + mod - width / 2;
-        nodeInfo.y = levelStart - nodeInfo.height;
-        return levelStart - this.levelsSpan[nodeInfo.level] - this.levelSpacing;
+        nodeInfo.y = levelStart - height - nodeOffset;
+        levelOffset = -levelOffset;
+        break;
       case 'left':
+        nodeInfo.x = levelStart - nodeInfo.width - nodeOffset;
         nodeInfo.y = nodeInfo.prelim + mod - height / 2;
-        nodeInfo.x = levelStart - nodeInfo.width;
-        return levelStart - this.levelsSpan[nodeInfo.level] - this.levelSpacing;
+        levelOffset = -levelOffset;
+        break;
       case 'right':
+        nodeInfo.x = levelStart + nodeOffset;
         nodeInfo.y = nodeInfo.prelim + mod - height / 2;
-        nodeInfo.x = levelStart;
-        return levelStart + this.levelsSpan[nodeInfo.level] + this.levelSpacing;
+        break;
       default:
         nodeInfo.x = nodeInfo.prelim + mod - width / 2;
-        nodeInfo.y = levelStart;
-        return levelStart + this.levelsSpan[nodeInfo.level] + this.levelSpacing;
+        nodeInfo.y = levelStart + nodeOffset;
+        break;
     }
+    return levelStart + levelOffset;
   }
 
   calculateEdge(
