@@ -1,6 +1,14 @@
+import { LayoutOptions } from './types';
 // On the basis of Buchheim C, Jünger M, Leipert S. Improving Walker’s algorithm to run in linear time[C]
 // Graph Drawing: 10th International Symposium, GD 2002 Irvine, CA, USA, August 26–28, 2002 Revised Papers 10. Springer Berlin Heidelberg, 2002: 344-353.
-import { Options, NodeInfo, NodeRect, Edge, NodeBase, Position } from './types';
+import {
+  BaumOptions,
+  NodeInfo,
+  NodeRect,
+  Edge,
+  NodeBase,
+  Position,
+} from './types';
 const getAncestor = <Node>(
   leftNodeInfo: NodeInfo<Node>,
   rightNodeInfo: NodeInfo<Node>,
@@ -46,34 +54,16 @@ const executeShifts = <Node>(nodeInfo: NodeInfo<Node>) => {
 // - span: if the orientation is left/right, it's the height, otherwise it's the width
 export class LayoutTree<Node extends NodeBase<Node>> {
   rootInfo: NodeInfo<Node>;
-  options: Options<Node>;
+  options: LayoutOptions<Node>;
   width = 0;
   height = 0;
   levelsSpan: number[] = [];
   leafStart = 0;
   nodes: NodeRect<Node>[] = [];
   edges: Edge<Node>[] = [];
-  constructor(root: NodeInfo<Node>, options: Options<Node>) {
+  constructor(root: NodeInfo<Node>, options: LayoutOptions<Node>) {
     this.rootInfo = root;
     this.options = options;
-  }
-
-  get levelSpacing() {
-    const spacing = this.options.spacing;
-    return Array.isArray(spacing) ? spacing[0] : spacing;
-  }
-
-  get siblingSpacing() {
-    const spacing = this.options.spacing;
-    return Array.isArray(spacing) ? spacing[1] : spacing;
-  }
-
-  get isSizeEqualWidth() {
-    const { orientation } = this.options;
-    if (orientation === 'top' || orientation === 'bottom') {
-      return true;
-    }
-    return false;
   }
 
   get secondWalkStart() {
@@ -88,14 +78,14 @@ export class LayoutTree<Node extends NodeBase<Node>> {
   }
 
   getSize(nodeInfo: NodeInfo<Node>) {
-    if (this.isSizeEqualWidth) {
+    if (this.options.isSizeEqualWidth) {
       return nodeInfo.width;
     }
     return nodeInfo.height;
   }
 
   getSpan(nodeInfo: NodeInfo<Node>) {
-    if (this.isSizeEqualWidth) {
+    if (this.options.isSizeEqualWidth) {
       return nodeInfo.height;
     }
     return nodeInfo.width;
@@ -109,6 +99,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     node: NodeInfo<Node>,
     defaultAncestor: NodeInfo<Node>
   ): NodeInfo<Node> {
+    const { siblingSpacing } = this.options;
     const leftSibling = node.previousSibling;
     if (leftSibling) {
       let rightTreeLeftmost = node;
@@ -135,7 +126,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
           leftTreeRightmost.prelim +
           leftTreeRightmostModSum -
           (rightTreeLeftmost.prelim + rightTreeLeftmostModSum) +
-          this.siblingSpacing +
+          siblingSpacing +
           this.getMeanSize(leftTreeRightmost, rightTreeLeftmost);
 
         if (shift > 0) {
@@ -182,6 +173,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
   }
 
   roomyWalk(nodeInfo: NodeInfo<Node>) {
+    const { siblingSpacing } = this.options;
     this.setLevelsSpan(nodeInfo);
 
     const { children = [] } = nodeInfo;
@@ -197,11 +189,12 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     } else {
       this.leafStart += this.getSize(nodeInfo) / 2;
       nodeInfo.prelim = this.leafStart;
-      this.leafStart += this.getSize(nodeInfo) / 2 + this.siblingSpacing;
+      this.leafStart += this.getSize(nodeInfo) / 2 + siblingSpacing;
     }
   }
 
   compactWalk(nodeInfo: NodeInfo<Node>) {
+    const { siblingSpacing } = this.options;
     this.setLevelsSpan(nodeInfo);
 
     const { previousSibling, children = [] } = nodeInfo;
@@ -220,7 +213,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
       if (previousSibling) {
         nodeInfo.prelim =
           previousSibling.prelim +
-          this.siblingSpacing +
+          siblingSpacing +
           this.getMeanSize(previousSibling, nodeInfo);
         nodeInfo.mod = nodeInfo.prelim - midpoint;
       } else {
@@ -229,7 +222,7 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     } else if (previousSibling) {
       nodeInfo.prelim =
         previousSibling.prelim +
-        this.siblingSpacing +
+        siblingSpacing +
         this.getMeanSize(previousSibling, nodeInfo);
     } else {
       nodeInfo.prelim = this.getSize(nodeInfo) / 2;
@@ -242,13 +235,13 @@ export class LayoutTree<Node extends NodeBase<Node>> {
     levelStart: number
   ): number {
     const { width, height, level } = nodeInfo;
-    const { orientation, levelAlign } = this.options;
+    const { orientation, levelAlign, levelSpacing } = this.options;
 
     let levelOffset!: number;
     if (levelAlign === 'none') {
-      levelOffset = height + this.levelSpacing;
+      levelOffset = height + levelSpacing;
     } else {
-      levelOffset = this.levelsSpan[level] + this.levelSpacing;
+      levelOffset = this.levelsSpan[level] + levelSpacing;
     }
 
     let nodeOffset = 0;
@@ -345,9 +338,10 @@ export class LayoutTree<Node extends NodeBase<Node>> {
   }
 
   secondWalk(nodeInfo: NodeInfo<Node>, mod: number, levelStart: number) {
+    const { isSizeEqualWidth } = this.options;
     levelStart = this.calculateNodePosition(nodeInfo, mod, levelStart);
 
-    if (this.isSizeEqualWidth) {
+    if (isSizeEqualWidth) {
       this.width = Math.max(this.width, nodeInfo.x + nodeInfo.width);
     } else {
       this.height = Math.max(this.height, nodeInfo.y + nodeInfo.height);
@@ -376,9 +370,10 @@ export class LayoutTree<Node extends NodeBase<Node>> {
   }
 
   calculateTreeSpan() {
-    let treeSpan = (this.levelsSpan.length - 1) * this.levelSpacing;
+    const { levelSpacing, isSizeEqualWidth } = this.options;
+    let treeSpan = (this.levelsSpan.length - 1) * levelSpacing;
     this.levelsSpan.forEach((levelSpan) => (treeSpan += levelSpan));
-    if (this.isSizeEqualWidth) {
+    if (isSizeEqualWidth) {
       this.height = treeSpan;
     } else {
       this.width = treeSpan;

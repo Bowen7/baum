@@ -11,11 +11,23 @@ export interface NodeBase<Node> {
   height?: number;
 }
 
-export type Options<Node extends NodeBase<Node>> = {
+export type BaumOptions<Node extends NodeBase<Node>> = {
   orientation: Orientation;
   levelAlign: LevelAlign;
   compact: boolean;
   spacing: number | [number, number];
+  getID: (node: Node) => ID;
+  getChildren: (node: Node) => Node['children'];
+  getGroup: (node: Node) => Node['group'];
+};
+
+export type LayoutOptions<Node extends NodeBase<Node>> = {
+  orientation: Orientation;
+  levelAlign: LevelAlign;
+  compact: boolean;
+  siblingSpacing: number;
+  levelSpacing: number;
+  isSizeEqualWidth: boolean;
   getID: (node: Node) => ID;
   getChildren: (node: Node) => Node['children'];
   getGroup: (node: Node) => Node['group'];

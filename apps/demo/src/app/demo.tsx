@@ -1,5 +1,5 @@
-import { baum, Options } from 'baum';
-import { Fragment, useState } from 'react';
+import { baum, BaumOptions } from 'baum';
+import { Fragment, useEffect, useState } from 'react';
 type Tree = {
   title: string;
   children?: Tree[];
@@ -65,7 +65,7 @@ const root: Tree = {
     },
   ],
 };
-const options: Partial<Options<Tree>> = {
+const options: Partial<BaumOptions<Tree>> = {
   orientation: 'bottom',
   levelAlign: 'center',
   spacing: [40, 25],
@@ -83,8 +83,8 @@ export const Demo = () => {
             node,
             x,
             y,
-            width,
-            height,
+            width: nodeWidth,
+            height: nodeHeight,
           }: {
             node: Tree;
             x: number;
@@ -92,26 +92,26 @@ export const Demo = () => {
             width: number;
             height: number;
           }) => (
-            <Fragment>
+            <g>
               <rect
                 key={node.title}
                 x={x}
                 y={y}
-                width={width}
-                height={height}
+                width={nodeWidth}
+                height={nodeHeight}
                 fill="transparent"
                 stroke="black"
               />
               <text
                 textAnchor="middle"
                 fontSize={16}
-                x={x + width / 2}
-                y={y + height / 2}
+                x={x + nodeWidth / 2}
+                y={y + nodeHeight / 2}
                 dy={8}
               >
                 {node.title}
               </text>
-            </Fragment>
+            </g>
           )
         )}
         {edges.map(({ start, end, startNode, endNode }) => (
